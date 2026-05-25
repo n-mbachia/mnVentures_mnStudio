@@ -1,0 +1,29 @@
+{% extends 'store/base.html' %}
+
+{% block title %}About MN Ventures — Furniture Nairobi{% endblock %}
+
+{% block content %}
+<section class="max-w-4xl mx-auto px-4 sm:px-6 py-20">
+  <div class="text-center mb-16">
+    <span class="text-xs tracking-[0.2em] uppercase text-amber-500 mb-3 block">✦ Our Story</span>
+    <h1 class="font-serif text-5xl font-black mb-6">About <em class="text-amber-500">MN Studio</em></h1>
+    <p class="text-stone-400 text-lg leading-relaxed max-w-2xl mx-auto">
+      MN Studio specializes in crafting custom and bespoke furniture using African hardwoods, softwoods, salvaged timber, and upcycled materials. We blend natural elements with innovative design to create functional, timeless pieces—ranging from live-edge furniture to integrated material decor.</br>
+
+Our work serves a diverse clientele, from first-time homeowners to large commercial spaces, with over 65% of our projects tailored to specific client needs. Every piece is made to order, ensuring you get exactly what you envision, finished to the highest standard.</br>
+
+Explore our collection to discover past projects, available pieces, and auction items.
+    </p>
+  </div>
+
+  <div class="text-center bg-stone-900 border border-stone-800 rounded-2xl p-10">
+    <h2 class="font-serif text-2xl font-bold mb-4">Ready to Transform Your Space?</h2>
+    <p class="text-stone-400 mb-6">Chat with us on WhatsApp and let's find the perfect furniture for you.</p>
+    <a href="https://wa.me/{{ WHATSAPP_NUMBER_CLEAN }}?text=Hello%20MN%20Ventures!%20I'd%20like%20to%20order%20furniture."
+       target="_blank"
+       class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white font-semibold px-6 py-3 rounded-xl transition">
+      💬 Chat on WhatsApp
+    </a>
+  </div>
+</section>
+{% endblock %}

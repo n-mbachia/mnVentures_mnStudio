@@ -1,0 +1,449 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}{{ auction.product.name }} Auction — MN Studio{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Breadcrumb -->
+  <nav class="text-xs text-stone-500 mb-8 flex items-center gap-2">
+    <a href="{% url 'store:home' %}" class="hover:text-amber-400 transition">Home</a>
+    <span>/</span>
+    <a href="{% url 'store:auction_list' %}" class="hover:text-amber-400 transition">Auctions</a>
+    <span>/</span>
+    <span class="text-stone-300">{{ auction.product.name }}</span>
+  </nav>
+
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-10">
+
+    <!-- LEFT: Image + Details -->
+    <div class="lg:col-span-3 space-y-6">
+
+      <!-- Image -->
+      <div class="relative rounded-2xl overflow-hidden border border-stone-800 bg-stone-900">
+        {% if auction.product.image %}
+        <img src="{{ auction.product.image.url }}" alt="{{ auction.product.name }}"
+	  class="w-full h-auto object-display group-hover:scale-105 transition-transform duration-500">
+        {% else %}
+        <div class="w-full aspect-square bg-gradient-to-br from-stone-800 to-stone-900 flex items-center justify-center text-8xl">🛋️</div>
+        {% endif %}
+
+        <!-- Status overlay -->
+        {% if auction.status == 'live' %}
+        <div class="absolute top-4 left-4 flex items-center gap-2 bg-red-600 text-white text-sm font-bold px-4 py-2 rounded-full">
+          <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span></span>
+          LIVE AUCTION
+        </div>
+        {% elif auction.status == 'upcoming' %}
+        <div class="absolute top-4 left-4 bg-amber-600 text-white text-sm font-bold px-4 py-2 rounded-full">UPCOMING</div>
+        {% elif auction.status == 'closed' %}
+        <div class="absolute top-4 left-4 bg-stone-700 text-stone-300 text-sm font-bold px-4 py-2 rounded-full">AUCTION CLOSED</div>
+        {% endif %}
+      </div>
+
+      <!-- Product Info -->
+      <div class="bg-stone-900 border border-stone-800 rounded-2xl p-6">
+        <div class="text-xs uppercase tracking-wider text-amber-600 mb-2">{{ auction.product.category.name|default:"Furniture" }}</div>
+        <h1 class="font-serif text-3xl font-black mb-4">{{ auction.product.name }}</h1>
+        <p class="text-stone-400 leading-relaxed text-sm">{{ auction.product.description }}</p>
+        {% if auction.description %}
+        <div class="mt-4 pt-4 border-t border-stone-800">
+          <h3 class="text-xs uppercase tracking-wider text-stone-500 mb-2">Auction Notes</h3>
+          <p class="text-stone-400 text-sm leading-relaxed">{{ auction.description }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Auction Meta -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-stone-800 text-center">
+          <div>
+            <div class="text-xs text-stone-500 uppercase tracking-wider">Starting Price</div>
+            <div class="font-serif font-bold text-amber-400">KSh {{ auction.starting_price|floatformat:0 }}</div>
+          </div>
+          <div>
+            <div class="text-xs text-stone-500 uppercase tracking-wider">Min Increment</div>
+            <div class="font-serif font-bold">KSh {{ auction.bid_increment|floatformat:0 }}</div>
+          </div>
+          <div>
+            <div class="text-xs text-stone-500 uppercase tracking-wider">Views</div>
+            <div class="font-serif font-bold">{{ auction.views_count }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enquire via WhatsApp -->
+      <a href="{{ wa_link }}" target="_blank"
+         class="flex items-center justify-center gap-3 bg-green-600 hover:bg-green-500 text-white font-semibold py-3 rounded-xl transition">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Ask a Question on WhatsApp
+      </a>
+    </div>
+
+    <!-- RIGHT: Bidding Panel -->
+    <div class="lg:col-span-2 space-y-5">
+
+      <!-- Live Price Card -->
+      <div id="priceCard" class="bg-stone-900 border {% if auction.status == 'live' %}border-amber-600/50{% else %}border-stone-800{% endif %} rounded-2xl p-6">
+        <div class="text-xs uppercase tracking-wider text-stone-400 mb-1">
+          {% if auction.status == 'live' %}Current Highest Bid{% elif auction.status == 'upcoming' %}Starting Bid{% else %}Final Price{% endif %}
+        </div>
+        <div id="currentPrice" class="font-serif text-4xl font-black text-amber-500 mb-1">{{ auction.formatted_price }}</div>
+        <div class="text-xs text-stone-500" id="bidCount">{{ auction.bid_count }} bid{{ auction.bid_count|pluralize }}</div>
+
+        {% if auction.status == 'live' %}
+        <!-- Countdown -->
+        <div class="mt-5 pt-5 border-t border-stone-800">
+          <div class="text-xs uppercase tracking-wider text-stone-400 mb-2">Time Remaining</div>
+          <div id="bigCountdown" class="font-mono text-3xl font-bold text-white tracking-wider" data-end="{{ auction.end_time.isoformat }}">--:--:--</div>
+          <div class="mt-2 bg-stone-800 rounded-full h-2 overflow-hidden">
+            <div id="progressBar" class="h-full bg-gradient-to-r from-amber-600 to-red-500 rounded-full transition-all duration-1000" style="width:100%"></div>
+          </div>
+          <div class="text-xs text-stone-500 mt-1">Ends {{ auction.end_time|date:"d M Y \a\t H:i" }}</div>
+        </div>
+        {% elif auction.status == 'upcoming' %}
+        <div class="mt-5 pt-5 border-t border-stone-800">
+          <div class="text-xs uppercase tracking-wider text-stone-400 mb-1">Starts</div>
+          <div class="font-semibold">{{ auction.start_time|date:"d M Y \a\t H:i" }}</div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- WINNER CARD (hidden until closed) -->
+      <div id="winnerCard" class="hidden bg-amber-950/50 border border-amber-600/50 rounded-2xl p-6 text-center">
+        <div class="text-4xl mb-3">🎉</div>
+        <h3 class="font-serif text-xl font-bold text-amber-400 mb-2">Auction Closed!</h3>
+        <div id="winnerName" class="font-semibold mb-1"></div>
+        <div id="winnerAmount" class="font-serif text-2xl font-black text-amber-500 mb-4"></div>
+        <a id="winnerWABtn" href="#" target="_blank"
+           class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white font-semibold px-5 py-3 rounded-xl transition text-sm">
+          💬 Contact Winner on WhatsApp
+        </a>
+      </div>
+
+      <!-- BID FORM -->
+      {% if auction.status == 'live' %}
+      <div class="bg-stone-900 border border-stone-800 rounded-2xl p-6">
+        <h2 class="font-serif text-xl font-bold mb-5">Place Your Bid</h2>
+
+        <div id="bidAlert" class="hidden mb-4 p-3 rounded-lg text-sm text-center"></div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-stone-400 mb-2">Full Name *</label>
+            <input id="bidName" type="text" placeholder="Your full name"
+                   class="w-full px-4 py-3 rounded-lg bg-stone-800 border border-stone-600 text-white placeholder-stone-400 focus:outline-none focus:border-amber-500 transition">
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-stone-400 mb-2">Phone (WhatsApp) *</label>
+            <input id="bidPhone" type="tel" placeholder="+254 7XX XXX XXX"
+                   class="w-full px-4 py-3 rounded-lg bg-stone-800 border border-stone-600 text-white placeholder-stone-400 focus:outline-none focus:border-amber-500 transition">
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-stone-400 mb-2">Email (optional)</label>
+            <input id="bidEmail" type="email" placeholder="your@email.com"
+                   class="w-full px-4 py-3 rounded-lg bg-stone-800 border border-stone-600 text-white placeholder-stone-400 focus:outline-none focus:border-amber-500 transition">
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-stone-400 mb-2">Submit Your Bid (KSh) *</label>
+            <input id="bidAmount" type="number" step="500" min="{{ min_bid }}"
+                   placeholder="Min: KSh {{ min_bid|floatformat:0 }}"
+                   class="w-full px-4 py-3 rounded-lg bg-stone-800 border border-stone-600 text-white placeholder-stone-400 focus:outline-none focus:border-amber-500 transition">
+            <p class="text-xs text-stone-500 mt-1">Minimum bid: <span id="minBidText">KSh {{ min_bid|floatformat:0 }}</span></p></br>
+            
+            <!-- Call to action for people to simply pay if they want to won the piece -->
+            <p class="text-stone-450 text-sm leading-relaxed">
+              Love this piece? Simply pay the minimum bid amount below and register your contact information. Our team will reach out directly to coordinate delivery.
+            </p></br>
+            <div class="inline-block">
+		<span class="text-[13px] md:text-[14px] text-brand border border-brand/30 px-4 py-2 rounded-full tracking-wide font-medium">
+		    M-Pesa Paybill <span class="font-bold">247247</span> | Account <span class="font-bold">741222</span>
+		</span>
+	    </div>
+          </div>
+
+          <!-- Quick bid buttons -->
+          <div class="flex gap-2 flex-wrap" id="quickBids">
+            {% with min=min_bid %}
+            <button onclick="setQuickBid({{ min_bid }})" class="quick-bid-btn text-xs bg-stone-800 hover:bg-amber-700 border border-stone-600 hover:border-amber-600 text-stone-300 hover:text-white px-3 py-1.5 rounded-lg transition">
+              KSh {{ min_bid|floatformat:0 }}
+            </button>
+            {% endwith %}
+          </div>
+
+          <button id="submitBidBtn" onclick="submitBid()"
+                  class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-4 rounded-xl text-lg transition transform hover:-translate-y-0.5 hover:shadow-xl hover:shadow-amber-900/30">
+            🔨 Place Bid
+          </button>
+        </div>
+
+        <p class="text-xs text-stone-600 mt-4 text-center">
+          By bidding you agree to be contacted on WhatsApp if you win.
+        </p>
+      </div>
+      {% elif auction.status == 'upcoming' %}
+      <div class="bg-stone-900 border border-stone-800 rounded-2xl p-6 text-center">
+        <div class="text-4xl mb-3">⏳</div>
+        <h3 class="font-semibold mb-2">Auction Not Started Yet</h3>
+        <p class="text-stone-400 text-sm mb-4">Bidding opens {{ auction.start_time|date:"d M Y \a\t H:i" }}</p>
+        <a href="https://wa.me/{{ WHATSAPP_NUMBER_CLEAN }}?text=Hello%20MN%20Ventures!%20Please%20notify%20me%20when%20the%20auction%20for%20*{{ auction.product.name }}*%20starts."
+           target="_blank"
+           class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white font-medium px-5 py-3 rounded-xl transition text-sm">
+          💬 Notify Me on WhatsApp
+        </a>
+      </div>
+      {% endif %}
+
+      <!-- BID HISTORY -->
+      <div class="bg-stone-900 border border-stone-800 rounded-2xl p-6">
+        <h3 class="font-semibold mb-4 flex items-center justify-between">
+          <span>Bid History</span>
+          <span id="liveCount" class="text-xs bg-stone-800 px-3 py-1 rounded-full text-stone-400">{{ auction.bid_count }} bids</span>
+        </h3>
+        <div id="bidList" class="space-y-2 max-h-64 overflow-y-auto pr-1">
+          {% for bid in bids %}
+          <div class="flex items-center justify-between py-2 border-b border-stone-800 text-sm {% if forloop.first %}text-amber-400 font-semibold{% else %}text-stone-400{% endif %}">
+            <span>{% if forloop.first %}👑 {% endif %}{{ bid.bidder.name }}</span>
+            <div class="text-right">
+              <div>KSh {{ bid.amount|floatformat:0 }}</div>
+              <div class="text-xs text-stone-600">{{ bid.placed_at|date:"d M H:i" }}</div>
+            </div>
+          </div>
+          {% empty %}
+          <p class="text-stone-500 text-sm text-center py-4">No bids yet — be the first!</p>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const AUCTION_SLUG   = '{{ auction.slug }}';
+const AUCTION_STATUS = '{{ auction.status }}';
+const AUCTION_END    = new Date('{{ auction.end_time.isoformat }}');
+let   totalDuration  = {{ auction.time_remaining_seconds }};
+let   pollInterval   = null;
+let   countdownDone  = false;
+
+// ── COUNTDOWN ─────────────────────────────────────────────────────────────────
+const bigCountdown = document.getElementById('bigCountdown');
+const progressBar  = document.getElementById('progressBar');
+
+function updateCountdown() {
+  const diff = Math.max(0, Math.floor((AUCTION_END - Date.now()) / 1000));
+  const h = Math.floor(diff / 3600).toString().padStart(2, '0');
+  const m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0');
+  const s = (diff % 60).toString().padStart(2, '0');
+
+  if (bigCountdown) {
+    bigCountdown.textContent = `${h}:${m}:${s}`;
+    if (diff < 300) bigCountdown.classList.add('text-red-400');
+    else            bigCountdown.classList.remove('text-red-400');
+  }
+
+  if (progressBar && totalDuration > 0) {
+    progressBar.style.width = `${(diff / totalDuration) * 100}%`;
+  }
+
+  // Countdown just hit zero — poll immediately instead of waiting 10 s
+  if (diff === 0 && !countdownDone) {
+    countdownDone = true;
+    clearInterval(countdownInterval);
+    // Poll aggressively every 2 s until the server confirms closed
+    clearInterval(pollInterval);
+    pollInterval = setInterval(pollStatus, 2000);
+    pollStatus();
+  }
+}
+
+let countdownInterval = null;
+if (bigCountdown && AUCTION_STATUS === 'live') {
+  updateCountdown();
+  countdownInterval = setInterval(updateCountdown, 1000);
+}
+
+// ── BID PLACEMENT ─────────────────────────────────────────────────────────────
+async function submitBid() {
+  const btn    = document.getElementById('submitBidBtn');
+  const alert  = document.getElementById('bidAlert');
+  const name   = document.getElementById('bidName').value.trim();
+  const phone  = document.getElementById('bidPhone').value.trim();
+  const email  = document.getElementById('bidEmail').value.trim();
+  const amount = document.getElementById('bidAmount').value.trim();
+
+  if (!name || !phone || !amount) {
+    showAlert('Please fill in your name, phone and bid amount.', 'error');
+    return;
+  }
+
+  btn.disabled    = true;
+  btn.textContent = '⏳ Placing bid...';
+
+  const form = new FormData();
+  form.append('name',   name);
+  form.append('phone',  phone);
+  form.append('email',  email);
+  form.append('amount', amount);
+
+  try {
+    const res  = await fetch(`/auctions/${AUCTION_SLUG}/bid/`, { method: 'POST', body: form });
+    const data = await res.json();
+    if (data.success) {
+      showAlert(`✅ Bid of ${data.amount_formatted} placed!`, 'success');
+      document.getElementById('bidAmount').value = '';
+      document.getElementById('currentPrice').textContent  = data.amount_formatted;
+      document.getElementById('bidCount').textContent      = `${data.bid_count} bid${data.bid_count !== 1 ? 's' : ''}`;
+      document.getElementById('liveCount').textContent     = `${data.bid_count} bids`;
+      if (document.getElementById('minBidText'))
+        document.getElementById('minBidText').textContent  = data.min_next_bid_formatted;
+      document.getElementById('bidAmount').min             = data.min_next_bid;
+      document.getElementById('bidAmount').placeholder     = `Min: ${data.min_next_bid_formatted}`;
+      prependBid(name, data.amount_formatted);
+
+      // If the server says the auction was extended, sync the new end time
+      if (data.extended && data.new_end_time) {
+        totalDuration = Math.floor((new Date(data.new_end_time) - Date.now()) / 1000);
+        showAlert(`⚠️ Auction extended (snipe protection). New end time updated.`, 'warning');
+      }
+    } else {
+      showAlert(data.error || 'Something went wrong.', 'error');
+    }
+  } catch {
+    showAlert('Network error. Please try again.', 'error');
+  }
+
+  btn.disabled    = false;
+  btn.textContent = '🔨 Place Bid';
+}
+
+function showAlert(msg, type) {
+  const el = document.getElementById('bidAlert');
+  el.textContent = msg;
+  el.className = `mb-4 p-3 rounded-lg text-sm text-center ${
+    type === 'success' ? 'bg-green-900/40 text-green-300' :
+    type === 'warning' ? 'bg-amber-900/40 text-amber-300' :
+                         'bg-red-900/40 text-red-300'
+  }`;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 6000);
+}
+
+function prependBid(name, amount) {
+  const list = document.getElementById('bidList');
+  list.querySelectorAll('.text-amber-400').forEach(el => {
+    el.classList.remove('text-amber-400', 'font-semibold');
+    el.classList.add('text-stone-400');
+    const span = el.querySelector('span');
+    if (span) span.textContent = span.textContent.replace('👑 ', '');
+  });
+  const el = document.createElement('div');
+  el.className = 'flex items-center justify-between py-2 border-b border-stone-800 text-sm text-amber-400 font-semibold';
+  el.innerHTML = `<span>👑 ${name}</span><div><div>${amount}</div><div class="text-xs text-stone-600">Just now</div></div>`;
+  list.prepend(el);
+}
+
+function setQuickBid(amount) {
+  document.getElementById('bidAmount').value = amount;
+}
+
+// ── REVEAL WINNER ─────────────────────────────────────────────────────────────
+function revealWinner(data) {
+  // Hide bid form using the reliable ID (not a fragile CSS selector)
+  const bidForm = document.getElementById('bidFormCard');
+  if (bidForm) bidForm.style.display = 'none';
+
+  // Update status label
+  const bidCount = document.getElementById('bidCount');
+  if (bidCount) bidCount.textContent = `${data.bid_count} bids · Closed`;
+
+  const wc = document.getElementById('winnerCard');
+  if (!wc) return;
+
+  if (data.winner) {
+    const nameEl   = document.getElementById('winnerName');
+    const amountEl = document.getElementById('winnerAmount');
+    const phoneEl  = document.getElementById('winnerPhone');
+    const waBtn    = document.getElementById('winnerWABtn');
+    if (nameEl)   nameEl.textContent   = `Winner: ${data.winner.name}`;
+    if (amountEl) amountEl.textContent = data.winner.amount;
+    if (phoneEl)  phoneEl.textContent  = data.winner.phone;
+    if (waBtn)    waBtn.href           = data.winner.wa_link;
+    wc.classList.remove('hidden');
+  } else {
+    // No winner (reserve not met) — show a closed notice instead
+    wc.outerHTML = `
+      <div class="bg-stone-900 border border-stone-700 rounded-2xl p-6 text-center text-stone-400">
+        <div class="text-3xl mb-2">🔔</div>
+        <p class="font-semibold text-white mb-1">Auction Closed</p>
+        <p class="text-sm">No winner — reserve price was not met.</p>
+      </div>`;
+  }
+
+  // Stop all polling once winner is shown
+  clearInterval(pollInterval);
+}
+
+// ── LIVE POLLING ─────────────────────────────────────────────────────────────
+async function pollStatus() {
+  try {
+    const res  = await fetch(`/auctions/${AUCTION_SLUG}/status/`);
+    const data = await res.json();
+
+    // Update live price and bid list
+    if (data.top_bids && data.top_bids.length) {
+      const list = document.getElementById('bidList');
+      if (list) {
+        list.innerHTML = data.top_bids.map((b, i) => `
+          <div class="flex items-center justify-between py-2 border-b border-stone-800 text-sm
+                      ${i === 0 ? 'text-amber-400 font-semibold' : 'text-stone-400'}">
+            <span>${i === 0 ? '👑 ' : ''}${b.bidder}</span>
+            <div><div>${b.amount}</div><div class="text-xs text-stone-600">${b.time}</div></div>
+          </div>`).join('');
+      }
+      const cp = document.getElementById('currentPrice');
+      if (cp) cp.textContent = data.current_price;
+
+      const bc = document.getElementById('bidCount');
+      if (bc && data.status === 'live')
+        bc.textContent = `${data.bid_count} bid${data.bid_count !== 1 ? 's' : ''}`;
+
+      const lc = document.getElementById('liveCount');
+      if (lc) lc.textContent = `${data.bid_count} bids`;
+
+      const mbt = document.getElementById('minBidText');
+      if (mbt) mbt.textContent = data.min_next_bid;
+    }
+
+    // Auction has closed — reveal winner
+    if (data.status === 'closed') {
+      revealWinner(data);
+    }
+
+    // If the auction was extended (snipe protection), sync new end time
+    if (data.end_time_iso) {
+      const serverEnd = new Date(data.end_time_iso);
+      if (serverEnd > AUCTION_END) {
+        // Restart countdown with new end time
+        clearInterval(countdownInterval);
+        totalDuration = Math.floor((serverEnd - Date.now()) / 1000);
+        AUCTION_END.setTime(serverEnd.getTime());
+        countdownDone = false;
+        countdownInterval = setInterval(updateCountdown, 1000);
+      }
+    }
+
+  } catch (e) {
+    console.warn('Poll failed:', e);
+  }
+}
+
+// Start normal 10 s polling when live
+if (AUCTION_STATUS === 'live') {
+  pollInterval = setInterval(pollStatus, 10000);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+# ── Django core ───────────────────────────────────────────
+Django>=4.2,<5.0
+psycopg2-binary>=2.9
+python-decouple>=3.8
+Pillow>=10.0
+whitenoise>=6.6
+gunicorn>=21.2
+requests>=2.31
+
+# ── Celery + Redis (background tasks & auction closing) ───
+celery>=5.3
+redis>=5.0
+django-celery-beat>=2.5     # stores beat schedule in DB
+django-celery-results>=2.5  # stores task results in DB
+
+# ── Security ──────────────────────────────────────────────
+django-ratelimit>=4.1        # optional extra rate limiting

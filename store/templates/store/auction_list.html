@@ -1,0 +1,132 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}Auctions — MN Studio{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+  <!-- Header -->
+  <div class="text-center mb-14">
+    <span class="text-xs tracking-[0.2em] uppercase text-amber-500 mb-3 block">✦ Exclusive Deals</span>
+    <h1 class="font-serif text-5xl font-black mb-4">MN Studio <em class="text-amber-500">Auctions</em></h1>
+    <p class="text-stone-400 max-w-xl mx-auto text-sm leading-relaxed">
+      Bid on brand-new and limited-edition furniture pieces. The highest bidder wins when the timer hits zero.
+    </p>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-16">
+    {% for step in "1234"|make_list %}
+    <div class="bg-stone-900 border border-stone-800 rounded-xl p-5 text-center">
+      {% if forloop.counter == 1 %}
+      <div class="text-3xl mb-3">👁️</div>
+      <h3 class="font-semibold text-sm mb-1">1. Browse</h3>
+      <p class="text-stone-500 text-xs">Find a piece you love from our new arrivals.</p>
+      {% elif forloop.counter == 2 %}
+      <div class="text-3xl mb-3">💰</div>
+      <h3 class="font-semibold text-sm mb-1">2. Place a Bid</h3>
+      <p class="text-stone-500 text-xs">Enter your name, phone and bid amount.</p>
+      {% elif forloop.counter == 3 %}
+      <div class="text-3xl mb-3">⏱️</div>
+      <h3 class="font-semibold text-sm mb-1">3. Watch the Timer</h3>
+      <p class="text-stone-500 text-xs">Outbid others before the countdown ends.</p>
+      {% elif forloop.counter == 4 %}
+      <div class="text-3xl mb-3">🎉</div>
+      <h3 class="font-semibold text-sm mb-1">4. Win & Pay via WhatsApp</h3>
+      <p class="text-stone-500 text-xs">Highest bidder is contacted on WhatsApp to arrange payment.</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- LIVE AUCTIONS -->
+  {% if live_auctions %}
+  <div class="mb-14">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span>
+      <h2 class="font-serif text-2xl font-bold">Live Now</h2>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for auction in live_auctions %}
+      {% include 'store/_auction_card.html' with auction=auction %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- UPCOMING -->
+  {% if upcoming_auctions %}
+  <div class="mb-14">
+    <h2 class="font-serif text-2xl font-bold mb-6 flex items-center gap-2">⏳ <span>Coming Soon</span></h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for auction in upcoming_auctions %}
+      {% include 'store/_auction_card.html' with auction=auction %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if not live_auctions and not upcoming_auctions %}
+  <div class="text-center py-20 text-stone-500">
+    <div class="text-6xl mb-4">🔔</div>
+    <p class="mb-2">No active auctions right now.</p>
+    <p class="text-sm">Check back soon or contact us on WhatsApp to be notified.</p>
+    <a href="https://wa.me/{{ WHATSAPP_NUMBER_CLEAN }}?text=Hello%20MN%20Ventures!%20Please%20notify%20me%20when%20the%20next%20auction%20starts."
+       target="_blank" class="inline-flex items-center gap-2 mt-6 bg-green-600 hover:bg-green-500 text-white px-5 py-3 rounded-lg text-sm font-medium transition">
+      💬 Notify Me on WhatsApp
+    </a>
+  </div>
+  {% endif %}
+
+  <!-- CLOSED / PAST AUCTIONS -->
+  {% if closed_auctions %}
+  <div>
+    <h2 class="font-serif text-2xl font-bold mb-6 text-stone-400">Past Auctions</h2>
+    <div class="space-y-3">
+      {% for auction in closed_auctions %}
+      <a href="{% url 'store:auction_detail' auction.slug %}"
+         class="flex items-center gap-5 bg-stone-900 border border-stone-800 rounded-xl p-4 hover:border-stone-600 transition group">
+        {% if auction.product.image %}
+        <img src="{{ auction.product.image.url }}" alt="{{ auction.product.name }}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0 opacity-60">
+        {% else %}
+        <div class="w-16 h-16 rounded-lg bg-stone-800 flex items-center justify-center text-2xl flex-shrink-0 opacity-60">🛋️</div>
+        {% endif %}
+        <div class="flex-1 min-w-0">
+          <div class="font-semibold truncate group-hover:text-amber-400 transition">{{ auction.product.name }}</div>
+          <div class="text-xs text-stone-500 mt-0.5">Ended {{ auction.end_time|date:"d M Y" }} · {{ auction.bid_count }} bids</div>
+        </div>
+        <div class="text-right flex-shrink-0">
+          {% if auction.winning_bid %}
+          <div class="text-xs text-stone-500">Sold for</div>
+          <div class="font-serif font-bold text-amber-500">KSh {{ auction.winning_bid|floatformat:0 }}</div>
+          {% else %}
+          <span class="text-xs text-stone-600 bg-stone-800 px-3 py-1 rounded-full">No winner</span>
+          {% endif %}
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateCountdowns() {
+  document.querySelectorAll('[data-countdown]').forEach(el => {
+    const end = new Date(el.dataset.countdown);
+    const diff = Math.max(0, Math.floor((end - Date.now()) / 1000));
+    if (diff === 0) { el.textContent = '⏱ Ended'; return; }
+    const h = Math.floor(diff / 3600).toString().padStart(2,'0');
+    const m = Math.floor((diff % 3600) / 60).toString().padStart(2,'0');
+    const s = (diff % 60).toString().padStart(2,'0');
+    el.textContent = `⏱ ${h}:${m}:${s}`;
+  });
+}
+updateCountdowns();
+setInterval(updateCountdowns, 1000);
+</script>
+{% endblock %}

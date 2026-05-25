@@ -1,0 +1,21 @@
+{
+  "name": "mnventures",
+  "version": "1.0.0",
+  "description": "MN Ventures Furniture Store — Tailwind CSS build pipeline",
+  "private": true,
+  "scripts": {
+    "dev": "tailwindcss -i ./static/src/main.css -o ./static/store/css/tailwind.css --watch",
+    "build": "tailwindcss -i ./static/src/main.css -o ./static/store/css/tailwind.css --minify",
+    "build:dev": "tailwindcss -i ./static/src/main.css -o ./static/store/css/tailwind.css"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.11",
+    "@tailwindcss/typography": "^0.5.19",
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.13",
+    "tailwindcss": "^3.4.19"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.2.0"
+  }
+}

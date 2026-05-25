@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    /* Your luxury brand custom classes */
+    .nav-link { @apply text-stone-400 hover:text-white text-sm font-medium transition-colors duration-200; }
+    .mobile-nav-link { @apply block py-3 px-4 text-stone-300 hover:bg-white/5 hover:text-white rounded-lg transition-all; }
+    .section-eyebrow { @apply text-xs tracking-[0.2em] uppercase text-brand font-semibold; }
+    .live-dot {
+      @apply relative flex h-2 w-2 rounded-full bg-brand;
+      box-shadow: 0 0 8px #d97706;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+}

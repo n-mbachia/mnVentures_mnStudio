@@ -1,0 +1,121 @@
+{% load store_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice {{ invoice.invoice_number }} — MN Ventures</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #fff; color: #1a1a1a; font-size: 13px; padding: 40px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #b45309; padding-bottom: 24px; margin-bottom: 32px; }
+    .logo { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: #1a1a1a; }
+    .logo span { color: #b45309; }
+    .badge { background: #b45309; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; }
+    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; }
+    .meta-block h4 { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #888; margin-bottom: 6px; }
+    .meta-block p { line-height: 1.6; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+    th { background: #f5f0eb; padding: 8px 12px; text-align: left; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #555; }
+    td { padding: 10px 12px; border-bottom: 1px solid #eee; }
+    .totals { margin-left: auto; width: 280px; }
+    .totals tr:last-child td { font-weight: 600; font-size: 15px; color: #b45309; border-top: 2px solid #b45309; padding-top: 8px; }
+    .mpesa-box { background: #f5f0eb; border: 1px solid #d4a96b; border-radius: 8px; padding: 16px 20px; margin-top: 24px; }
+    .mpesa-box h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #b45309; margin-bottom: 8px; }
+    .mpesa-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee; text-align: center; color: #aaa; font-size: 11px; }
+    @media print {
+      body { padding: 20px; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <div class="logo">MN <span>Ventures</span></div>
+      <p style="color:#888;margin-top:4px;font-size:12px;">Nairobi, Kenya · +254 715 741 222</p>
+    </div>
+    <div style="text-align:right;">
+      <div class="badge">Tax Invoice</div>
+      <p style="margin-top:8px;font-size:18px;font-weight:600;color:#b45309;">{{ invoice.invoice_number }}</p>
+      <p style="color:#888;font-size:12px;">Issued: {{ invoice.issued_at|date:"d M Y" }}</p>
+    </div>
+  </div>
+
+  <div class="meta-grid">
+    <div class="meta-block">
+      <h4>Sold by</h4>
+      <p><strong>MN Ventures</strong><br>Nairobi, Kenya<br>Tel: +254 715 741 222<br>
+        {% if VAT_REGISTRATION %}VAT Reg: {{ VAT_REGISTRATION }}{% endif %}
+      </p>
+    </div>
+    <div class="meta-block">
+      <h4>Billed to</h4>
+      <p><strong>{{ invoice.buyer_name }}</strong><br>
+         {{ invoice.buyer_phone }}<br>
+         {% if invoice.buyer_email %}{{ invoice.buyer_email }}{% endif %}
+      </p>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>M-Pesa Receipt</th>
+        <th style="text-align:right;">Amount (Excl. VAT)</th>
+        <th style="text-align:right;">VAT 16%</th>
+        <th style="text-align:right;">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          {% if payment.auction %}
+            Auction Win: {{ payment.auction.product.name }}
+          {% elif payment.product %}
+            Purchase: {{ payment.product.name }}
+          {% else %}
+            {{ payment.get_payment_type_display }}
+          {% endif %}
+        </td>
+        <td>{{ payment.mpesa_receipt_number|default:"—" }}</td>
+        <td style="text-align:right;">KSh {{ invoice.subtotal|floatformat:2 }}</td>
+        <td style="text-align:right;">KSh {{ invoice.vat_amount|floatformat:2 }}</td>
+        <td style="text-align:right;">KSh {{ invoice.total|floatformat:2 }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="totals">
+    <tr><td>Subtotal (Excl. VAT)</td><td style="text-align:right;">KSh {{ invoice.subtotal|floatformat:2 }}</td></tr>
+    <tr><td>VAT (16%)</td><td style="text-align:right;">KSh {{ invoice.vat_amount|floatformat:2 }}</td></tr>
+    <tr><td>Total Paid</td><td style="text-align:right;">KSh {{ invoice.total|floatformat:2 }}</td></tr>
+  </table>
+
+  <div class="mpesa-box">
+    <h4>💳 M-Pesa Payment Details</h4>
+    <div class="mpesa-row"><span>Paybill</span><strong>247247</strong></div>
+    <div class="mpesa-row"><span>Account Number</span><strong>741222</strong></div>
+    <div class="mpesa-row"><span>Receipt Number</span><strong>{{ payment.mpesa_receipt_number|default:"Pending" }}</strong></div>
+    <div class="mpesa-row"><span>Transaction Date</span><strong>{{ payment.transaction_date|default:payment.created_at|date:"d M Y H:i" }}</strong></div>
+    <div class="mpesa-row"><span>Status</span><strong style="color:{% if payment.is_paid %}green{% else %}#b45309{% endif %};">{{ payment.get_status_display }}</strong></div>
+  </div>
+
+  {% if invoice.notes %}
+  <p style="margin-top:16px;color:#888;font-size:11px;">Notes: {{ invoice.notes }}</p>
+  {% endif %}
+
+  <div class="footer">
+    <p>Thank you for choosing MN Ventures · Nairobi, Kenya · +254 715 741 222</p>
+    <p style="margin-top:4px;">Prices include 16% VAT · All sales subject to MN Ventures Terms &amp; Conditions</p>
+  </div>
+
+  <div class="no-print" style="text-align:center;margin-top:32px;">
+    <button onclick="window.print()" style="background:#b45309;color:#fff;border:none;padding:10px 24px;border-radius:6px;cursor:pointer;font-size:14px;">🖨 Print / Save as PDF</button>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,200 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} — MN Studio{% endblock %}
+
+{% block content %}
+
+<!-- ══ PRODUCT HERO ══ -->
+<section class="max-w-7xl mx-auto px-6 py-20">
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+
+    <!-- ── IMAGE ── -->
+    <div class="space-y-4">
+
+      <!-- Main Image -->
+      <div class="overflow-hidden rounded-xl bg-stone-900">
+        {% if product.image %}
+        <img src="{{ product.image.url }}"
+             alt="{{ product.name }}"
+             class="w-full object-cover hover:scale-[1.02] transition duration-700">
+        {% else %}
+        <div class="w-full aspect-square bg-stone-800"></div>
+        {% endif %}
+      </div>
+
+      <!-- Optional: Additional images -->
+      {% if product.gallery.all %}
+      <div class="grid grid-cols-4 gap-3">
+        {% for img in product.gallery.all %}
+        <img src="{{ img.image.url }}"
+             class="rounded-lg object-cover cursor-pointer hover:opacity-80 transition">
+        {% endfor %}
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- ── PRODUCT INFO ── -->
+    <div class="space-y-8">
+
+      <!-- Category -->
+      <div class="text-[10px] uppercase tracking-[0.3em] text-amber-600">
+        {{ product.category.name|default:"Furniture" }}
+      </div>
+
+      <!-- Title -->
+      <h1 class="font-serif text-3xl lg:text-4xl leading-tight">
+        {{ product.name }}
+      </h1>
+
+      <!-- Price / Positioning -->
+      <div class="text-amber-500 font-serif text-2xl">
+        {% if product.show_price %}
+          {{ product.formatted_price }}
+        {% else %}
+          <span class="text-stone-500 text-base italic">Price available on request</span>
+        {% endif %}
+      </div>
+
+      <!-- Description -->
+      <p class="text-stone-400 leading-relaxed text-sm max-w-lg">
+        {{ product.description }}
+      </p>
+
+      <!-- Key Details -->
+      <div class="grid grid-cols-2 gap-6 text-sm text-stone-400">
+
+        {% if product.material %}
+        <div>
+          <div class="uppercase tracking-widest text-xs text-stone-500 mb-1">Material</div>
+          <div class="text-white">{{ product.material }}</div>
+        </div>
+        {% endif %}
+
+        {% if product.dimensions %}
+        <div>
+          <div class="uppercase tracking-widest text-xs text-stone-500 mb-1">Dimensions</div>
+          <div class="text-white">{{ product.dimensions }}</div>
+        </div>
+        {% endif %}
+
+        {% if product.finish %}
+        <div>
+          <div class="uppercase tracking-widest text-xs text-stone-500 mb-1">Finish</div>
+          <div class="text-white">{{ product.finish }}</div>
+        </div>
+        {% endif %}
+
+        {% if product.lead_time %}
+        <div>
+          <div class="uppercase tracking-widest text-xs text-stone-500 mb-1">Lead Time</div>
+          <div class="text-white">{{ product.lead_time }}</div>
+        </div>
+        {% endif %}
+
+      </div>
+
+      <!-- Divider -->
+      <div class="border-t border-stone-800"></div>
+
+      <!-- CTA -->
+      <div class="flex flex-col sm:flex-row gap-4 pt-4">
+
+        <!-- Primary -->
+        <a href="https://wa.me/{{ whatsapp_number }}?text={{ product.whatsapp_message|urlencode }}"
+           target="_blank"
+           class="px-8 py-4 bg-amber-600 hover:bg-amber-500 text-white text-xs tracking-[0.25em] uppercase text-center transition">
+          Enquire on WhatsApp
+        </a>
+
+        <!-- Secondary -->
+        <a href="#"
+           class="px-8 py-4 border border-amber-600 text-amber-500 text-xs tracking-[0.25em] uppercase text-center hover:bg-amber-600 hover:text-white transition">
+          Request Customisation
+        </a>
+
+      </div>
+      
+      <!-- Trust Note -->
+      <p class="text-xs text-stone-500 pt-2">
+        Joinery Handcrafted  · Built to order · Nationwide delivery available
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ══ STORY / CRAFT SECTION ══ -->
+<section class="border-t border-stone-800 py-24 bg-stone-950">
+
+  <div class="max-w-5xl mx-auto text-center px-6">
+
+    <span class="text-[10px] tracking-[0.3em] uppercase text-amber-500 block mb-3">
+      Craftsmanship
+    </span>
+
+    <h2 class="font-serif text-4xl mb-6">
+      Designed with Purpose, <span class="italic text-amber-500">Built to Last</span>
+    </h2>
+
+    <p class="text-stone-400 max-w-2xl mx-auto text-sm leading-relaxed">
+      Each piece from MN Studio carries its own character as its made from carefully selected hardwoods,
+      shaped by skilled artisans, and finished to highlight the natural grain.
+    </p>
+
+  </div>
+
+</section>
+
+
+<!-- ══ RELATED PRODUCTS ══ -->
+{% if related_products %}
+<section class="max-w-7xl mx-auto px-6 py-24">
+
+  <div class="mb-12 text-center">
+    <span class="text-[10px] tracking-[0.3em] uppercase text-amber-500 block mb-3">
+      You May Also Like
+    </span>
+    <h2 class="font-serif text-3xl">
+      Similar Pieces
+    </h2>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+
+    {% for item in related_products %}
+    <div class="group">
+
+      <a href="{% url 'store:product_detail' item.slug %}" class="block mb-4 overflow-hidden rounded-xl">
+        {% if item.image %}
+        <img src="{{ item.image.url }}"
+             class="w-full aspect-square object-cover group-hover:scale-[1.03] transition duration-700">
+        {% endif %}
+      </a>
+
+      <h3 class="font-serif text-lg group-hover:text-amber-400 transition">
+        {{ item.name }}
+      </h3>
+
+      <div class="text-amber-500 text-sm mt-1">
+        {% if item.show_price %}
+          {{ item.formatted_price }}
+        {% else %}
+          <span class="text-stone-500 italic">On request</span>
+        {% endif %}
+      </div>
+
+    </div>
+    {% endfor %}
+
+  </div>
+
+</section>
+{% endif %}
+
+{% endblock %}

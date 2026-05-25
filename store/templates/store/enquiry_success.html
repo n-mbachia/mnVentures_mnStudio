@@ -1,0 +1,12 @@
+{% extends 'store/base.html' %}
+{% block title %}Enquiry Sent — MN Ventures{% endblock %}
+{% block content %}
+<div class="min-h-[60vh] flex items-center justify-center px-4">
+  <div class="text-center">
+    <div class="text-6xl mb-6">✅</div>
+    <h1 class="font-serif text-3xl font-bold mb-4">Thank You!</h1>
+    <p class="text-stone-400 mb-8">We've received your enquiry and will contact you shortly.</p>
+    <a href="{% url 'store:home' %}" class="bg-amber-600 hover:bg-amber-500 text-white font-medium px-6 py-3 rounded-lg transition">Back to Home</a>
+  </div>
+</div>
+{% endblock %}

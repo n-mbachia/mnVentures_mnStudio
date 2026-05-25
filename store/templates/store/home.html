@@ -1,0 +1,286 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}MN Studio — Bespoke Furniture in Nairobi{% endblock %}
+
+{% block content %}
+
+<!-- ══ HERO ══ -->
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+
+  <!-- Background -->
+  <div class="absolute inset-0 bg-gradient-to-br from-background via-stone-900 to-black"></div>
+
+  <!-- Subtle grid -->
+  <div class="absolute inset-0 opacity-[0.03]"
+       style="background-image: linear-gradient(rgba(217,119,6,0.4) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(217,119,6,0.4) 1px, transparent 1px);
+              background-size: 80px 80px;">
+  </div>
+
+  <div class="relative z-10 text-center max-w-3xl mx-auto px-6">
+
+    <span class="section-eyebrow mb-6 block">
+      Bespoke Craftsmanship
+    </span>
+
+    <h1 class="font-serif text-4xl md:text-6xl font-bold leading-tight mb-6 tracking-tight">
+      Artisanal Furniture <br>
+      <span class="text-brand italic">Defined by Timber</span>
+    </h1>
+
+    <p class="text-stone-400 max-w-lg mx-auto text-sm md:text-base leading-relaxed mb-10">
+      Handcrafted in our Kiambu studio using premium Kenyan hardwoods.
+      Each piece is designed to elevate your space with quiet sophistication.
+    </p>
+
+    <!-- CTA -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+
+      <!-- Primary -->
+      <a href="#products"
+         class="px-8 py-3 bg-brand text-black text-xs tracking-[0.2em] uppercase font-semibold
+                hover:opacity-90 transition-all duration-300">
+        View Collection
+      </a>
+
+      <!-- Secondary -->
+      <a href="https://wa.me/{{ whatsapp_number }}?text=Hello%20MN%20Studio.%20I%20would%20like%20to%20commission%20a%20piece."
+         target="_blank"
+         class="text-stone-400 hover:text-white text-xs tracking-[0.2em] uppercase transition flex items-center gap-2">
+        <span class="w-1 h-1 bg-brand rounded-full"></span>
+        Commission a Piece
+      </a>
+
+    </div>
+
+  </div>
+
+  <!-- Scroll hint -->
+  <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-stone-600 text-[10px] tracking-widest uppercase">
+    <div class="w-px h-10 bg-gradient-to-b from-brand to-transparent"></div>
+    Scroll
+  </div>
+
+</section>
+
+
+<!-- ══ STATS ══ -->
+<section class="border-y border-white/5 py-10 bg-background">
+  <div class="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+
+    {% for stat in stats %}
+    <div>
+      <div class="font-serif text-3xl text-brand">{{ stat.value }}</div>
+      <div class="text-stone-500 text-[11px] uppercase tracking-widest mt-2">
+        {{ stat.label }}
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+</section>
+
+
+<!-- ══ PRODUCTS ══ -->
+<section id="products" class="max-w-7xl mx-auto px-6 py-24">
+
+  <div class="text-center mb-16">
+    <span class="section-eyebrow mb-4 block">Collection</span>
+
+    <h2 class="font-serif text-4xl md:text-5xl font-bold tracking-tight">
+      Furniture for <span class="text-brand italic">Refined Spaces</span>
+    </h2>
+  </div>
+
+  <!-- Filter -->
+  <div class="flex flex-wrap justify-center gap-3 mb-12">
+
+    <button class="filter-btn active px-5 py-2 text-xs uppercase tracking-widest border border-brand text-white bg-brand">
+      All
+    </button>
+
+    {% for cat in categories %}
+    <button class="filter-btn px-5 py-2 text-xs uppercase tracking-widest border border-white/10 text-stone-400 hover:text-white hover:border-brand transition"
+            data-category="{{ cat.slug }}">
+      {{ cat.name }}
+    </button>
+    {% endfor %}
+
+  </div>
+
+  <!-- Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+    {% for product in products %}
+    <div class="group border border-white/5 hover:border-brand/40 transition-all duration-300">
+
+      <!-- Image -->
+      <a href="{% url 'store:product_detail' product.slug %}" class="block overflow-hidden">
+
+        {% if product.image %}
+        <img src="{{ product.image.url }}"
+             class="w-full aspect-square object-cover group-hover:scale-105 transition duration-700">
+        {% else %}
+        <div class="w-full aspect-square bg-stone-900 flex items-center justify-center text-5xl">
+          🛋️
+        </div>
+        {% endif %}
+
+      </a>
+
+      <!-- Info -->
+      <div class="p-5 space-y-3">
+
+        <div class="text-[10px] uppercase tracking-widest text-stone-500">
+          {{ product.category.name|default:"Furniture" }}
+        </div>
+
+        <h3 class="font-serif text-lg">
+          {{ product.name }}
+        </h3>
+
+        <div class="flex items-center justify-between pt-2">
+
+          <div class="text-brand font-serif text-lg">
+            {% if product.show_price %}
+              {{ product.formatted_price }}
+            {% else %}
+              <span class="text-stone-500 text-xs italic">On Request</span>
+            {% endif %}
+          </div>
+
+          <a href="https://wa.me/{{ whatsapp_number }}?text={{ product.whatsapp_message|urlencode }}"
+             target="_blank"
+             class="text-xs text-stone-400 hover:text-white transition">
+            Enquire →
+          </a>
+
+        </div>
+
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+
+</section>
+
+
+<!-- ══ WHY US ══ -->
+<section class="bg-black border-y border-white/5 py-24">
+
+  <div class="max-w-5xl mx-auto px-6 text-center mb-16">
+    <span class="section-eyebrow block mb-4">Why MN Studio</span>
+    <h2 class="font-serif text-4xl font-bold">
+      Built on <span class="text-brand italic">Craft & Integrity</span>
+    </h2>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 text-center">
+
+    {% for item in features %}
+    <div class="space-y-3">
+      <div class="text-2xl">{{ item.icon }}</div>
+      <h3 class="text-sm font-semibold">{{ item.title }}</h3>
+      <p class="text-stone-500 text-xs">{{ item.desc }}</p>
+    </div>
+    {% endfor %}
+
+  </div>
+
+</section>
+
+
+<!-- ══ CTA ══ -->
+<section class="text-center py-24 px-6 max-w-2xl mx-auto">
+
+  <span class="section-eyebrow mb-4 block">Enquiries</span>
+
+  <h2 class="font-serif text-4xl mb-6">
+    Begin Your <span class="text-brand italic">Custom Piece</span>
+  </h2>
+
+  <p class="text-stone-400 mb-10 text-sm leading-relaxed">
+    Speak directly with our studio. We design, build, and deliver across Kenya.
+  </p>
+
+  <a href="https://wa.me/{{ whatsapp_number }}?text=Hello%20MN%20Studio.%20I'd%20like%20to%20discuss%20a%20custom%20piece."
+     target="_blank"
+     class="inline-block px-10 py-4 bg-brand text-black text-sm tracking-widest uppercase font-semibold hover:opacity-90 transition">
+    Start Conversation
+  </a>
+
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Countdown timers
+function updateCountdowns() {
+  document.querySelectorAll('[data-countdown]').forEach(el => {
+    const end = new Date(el.dataset.countdown);
+    const diff = Math.max(0, Math.floor((end - Date.now()) / 1000));
+    if (diff === 0) { el.textContent = '⏱ Ended'; return; }
+    const h = Math.floor(diff / 3600).toString().padStart(2,'0');
+    const m = Math.floor((diff % 3600) / 60).toString().padStart(2,'0');
+    const s = (diff % 60).toString().padStart(2,'0');
+    el.textContent = `⏱ ${h}:${m}:${s}`;
+  });
+}
+updateCountdowns();
+setInterval(updateCountdowns, 1000);
+
+// Category filter
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.classList.remove('active', 'bg-amber-600', 'border-amber-600', 'text-white');
+      b.classList.add('border-stone-700', 'text-stone-400');
+    });
+    btn.classList.add('active', 'bg-amber-600', 'border-amber-600', 'text-white');
+    btn.classList.remove('border-stone-700', 'text-stone-400');
+
+    const cat = btn.dataset.category;
+    document.querySelectorAll('.product-card').forEach(card => {
+      card.style.display = (!cat || card.dataset.category === cat) ? '' : 'none';
+    });
+  });
+});
+
+// AJAX enquiry form
+const form = document.getElementById('enquiryForm');
+const msg = document.getElementById('formMsg');
+if (form) {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = form.querySelector('button[type=submit]');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+      const data = await res.json();
+      msg.classList.remove('hidden', 'bg-red-900/30', 'text-red-400', 'bg-green-900/30', 'text-green-400');
+      if (data.success) {
+        msg.classList.add('bg-green-900/30', 'text-green-400');
+        msg.textContent = data.message;
+        form.reset();
+      } else {
+        msg.classList.add('bg-red-900/30', 'text-red-400');
+        msg.textContent = 'Please fill in all required fields.';
+      }
+    } catch {
+      msg.classList.add('bg-red-900/30', 'text-red-400');
+      msg.textContent = 'Something went wrong. Please try WhatsApp instead.';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Send Enquiry';
+  });
+}
+</script>
+{% endblock %}

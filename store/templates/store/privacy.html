@@ -1,0 +1,47 @@
+{% extends 'store/base.html' %}
+{% block title %}Privacy & Data Transparency — {{ business_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-6 py-20 reveal">
+  <div class="text-center mb-16">
+    <span class="section-eyebrow">✦ Data Ethics</span>
+    <h1 class="section-title">Privacy <em>Policy</em></h1>
+    <p class="text-stone-500 text-xs tracking-widest uppercase mt-4">Effective Date: May 2026</p>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    <!-- Card: Collection -->
+    <div class="card rounded-none p-8 border-white/5 space-y-4">
+      <h2 class="font-serif text-xl text-white gold-shimmer">Data Collection</h2>
+      <p class="text-stone-400 text-sm">We securely process your name, contact details, and transaction history to facilitate our bespoke furniture services[cite: 4]. We do not store financial credentials or M-Pesa PINs.</p>
+    </div>
+
+    <!-- Card: Usage -->
+    <div class="card rounded-none p-8 border-white/5 space-y-4">
+      <h2 class="font-serif text-xl text-white gold-shimmer">Core Usage</h2>
+      <ul class="text-stone-400 text-xs space-y-2 uppercase tracking-wide">
+        <li>✦ Auction Bid Validation</li>
+        <li>✦ Order Fulfillment</li>
+        <li>✦ KRA Tax Documentation</li>
+        <li>✦ Fraud Mitigation</li>
+      </ul>
+    </div>
+
+    <!-- Card: Our Promise -->
+    <div class="card rounded-none p-8 border-white/5 space-y-4 col-span-full">
+      <h2 class="font-serif text-xl text-white gold-shimmer">Our Commitment</h2>
+      <p class="text-stone-400 text-sm">Your information is treated with the same craftsmanship as our furniture. We do not engage in third-party data brokerage or unsolicited marketing campaigns[cite: 4]. Data is retained for the 5-year period mandated by Kenyan fiscal law.</p>
+    </div>
+  </div>
+
+  <div class="mt-16 p-10 bg-surface-2 border border-brand/10 text-center">
+    <h3 class="font-serif text-lg text-white mb-4">Request Data Access</h3>
+    <p class="text-stone-400 text-sm mb-6">Under Kenyan Data Protection laws, you have the right to access or delete your records.</p>
+    <a href="https://wa.me/254715741222" class="btn-primary">Message our Studio</a>
+  </div>
+
+  <div class="mt-12 text-center">
+    <a href="{% url 'store:home' %}" class="btn-ghost">Return to Gallery</a>
+  </div>
+</div>
+{% endblock %}

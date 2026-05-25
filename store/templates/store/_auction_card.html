@@ -1,0 +1,56 @@
+{% load static %}
+<a href="{% url 'store:auction_detail' auction.slug %}"
+   class="group bg-stone-900 border {% if auction.status == 'live' %}border-amber-700/50 hover:border-amber-500{% else %}border-stone-800 hover:border-stone-600{% endif %} rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-2xl hover:shadow-amber-900/20 transition-all duration-300 block">
+
+  <!-- Image -->
+  <div class="relative overflow-hidden">
+    {% if auction.product.image %}
+    <img src="{{ auction.product.image.url }}" alt="{{ auction.product.name }}"
+         class="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500 {% if auction.status != 'live' %}opacity-70{% endif %}">
+    {% else %}
+    <div class="w-full aspect-square bg-gradient-to-br from-stone-800 to-stone-900 flex items-center justify-center text-6xl {% if auction.status != 'live' %}opacity-60{% endif %}">🛋️</div>
+    {% endif %}
+
+    <!-- Status badge -->
+    {% if auction.status == 'live' %}
+    <div class="absolute top-3 left-3 flex items-center gap-1.5 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+      <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span></span>
+      LIVE
+    </div>
+    {% elif auction.status == 'upcoming' %}
+    <div class="absolute top-3 left-3 bg-amber-600 text-white text-xs font-bold px-3 py-1 rounded-full">UPCOMING</div>
+    {% endif %}
+
+    <!-- Countdown -->
+    {% if auction.status == 'live' %}
+    <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs font-mono px-3 py-1.5 rounded-lg"
+         data-countdown="{{ auction.end_time.isoformat }}">⏱ --:--:--</div>
+    {% elif auction.status == 'upcoming' %}
+    <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-amber-300 text-xs font-mono px-3 py-1.5 rounded-lg">
+      Starts {{ auction.start_time|date:"d M, H:i" }}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Info -->
+  <div class="p-5">
+    <div class="text-xs uppercase tracking-wider text-amber-600 mb-1">{{ auction.product.category.name|default:"Furniture" }}</div>
+    <h3 class="font-serif font-bold text-lg mb-3 group-hover:text-amber-400 transition line-clamp-1">{{ auction.product.name }}</h3>
+    <div class="flex items-end justify-between">
+      <div>
+        <div class="text-xs text-stone-500 uppercase tracking-wider">
+          {% if auction.status == 'live' %}Current Bid{% else %}Starting From{% endif %}
+        </div>
+        <div class="font-serif text-xl font-bold text-amber-500">
+          {% if auction.status == 'live' %}{{ auction.formatted_price }}{% else %}KSh {{ auction.starting_price|floatformat:0 }}{% endif %}
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="text-xs text-stone-500 mb-1">{{ auction.bid_count }} bid{{ auction.bid_count|pluralize }}</div>
+        <span class="{% if auction.status == 'live' %}bg-amber-600 text-white{% else %}bg-stone-700 text-stone-300{% endif %} text-xs font-semibold px-3 py-1.5 rounded-lg">
+          {% if auction.status == 'live' %}Bid Now →{% else %}Preview{% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
+</a>

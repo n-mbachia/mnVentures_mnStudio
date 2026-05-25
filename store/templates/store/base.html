@@ -1,0 +1,232 @@
+<!-- store/template/store/base.html -->
+{% load static store_tags %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+
+  <!-- SEO & Social Meta (Kept your existing logic) -->
+  <title>{% block title %}MN Studio — Premium Furniture, Nairobi Kenya{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}MN Ventures — Premium handcrafted furniture for homes and offices in Nairobi, Kenya. Browse our collection and order via WhatsApp or bid in our live auctions.{% endblock %}">
+  <!-- ... [Keep your other meta tags here] ... -->
+
+  <!-- Tailwind CDN & Config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              DEFAULT: '#C28840',
+              300: '#fcd34d',
+              600: '#b45309',     // Needed for .btn-primary:hover
+              700: '#92400e',     // Needed for ::-webkit-scrollbar-thumb
+            },
+            background: '#0c0a09',
+            surface: {
+              DEFAULT: '#1c1917',
+              3: '#44403c',
+            }
+          },
+          backgroundImage: {
+            'brand-gradient': 'linear-gradient(to bottom right, #d97706, #78350f)',
+          },
+          boxShadow: {
+            'brand': '0 4px 14px 0 rgba(217, 119, 6, 0.39)',
+            'brand-lg': '0 10px 25px 0 rgba(217, 119, 6, 0.45)',
+          }
+        }
+      }
+    }
+  </script>
+   
+  <style>
+    .nav-link { @apply text-stone-400 hover:text-white text-sm font-medium transition-colors duration-200; }
+    .mobile-nav-link { @apply block py-3 px-4 text-stone-300 hover:bg-white/5 hover:text-white rounded-lg transition-all; }
+    .section-eyebrow { @apply text-xs tracking-[0.2em] uppercase text-brand font-semibold; }
+    .live-dot {
+      @apply relative flex h-2 w-2 rounded-full bg-brand;
+      box-shadow: 0 0 8px #d97706;
+    }
+    /* Hide scrollbar but keep functionality if needed */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+  </style>
+  
+  <!-- Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'store/css/custom.css' %}">
+  {% block extra_head %}{% endblock %}
+  
+</head>
+
+<body class="bg-background text-stone-100 font-sans antialiased selection:bg-brand/30">
+
+  {% csrf_token %}
+  <meta name="csrf-token" content="{{ csrf_token }}">
+
+  <!-- NAVBAR -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-white/5" role="navigation">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 lg:h-20">
+
+        <!-- Logo -->
+        <a href="{% url 'store:home' %}" class="flex items-center gap-3 group shrink-0">
+          <span class="font-serif text-3xl tracking-tight text-white italic">MN <span class="text-brand">Studio</span></span>
+        </a>
+
+        <!-- Desktop Menu -->
+        <ul class="hidden md:flex items-center gap-6 lg:gap-8">
+          <li><a href="{% url 'store:home' %}#products" class="nav-link">Collection</a></li>
+          <li>
+            <a href="{% url 'store:auction_list' %}" class="flex items-center gap-1 text-sm tracking-widest uppercase transition text-amber-400 hover:text-amber-300">
+              <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span></span>
+               Auctions
+            </a>
+          </li>
+          <li><a href="{% url 'store:my_bids' %}" class="nav-link">My Bids</a></li>
+          <li><a href="{% url 'store:about' %}" class="nav-link">About</a></li>
+          <li>
+            <a href="https://wa.me/{{ WHATSAPP_NUMBER_CLEAN }}" target="_blank"
+               class="border border-white/20 hover:border-brand text-green-500 text-sm font-medium px-4 py-2 rounded-lg transition-all">
+	      <i class="fab fa-whatsapp mr-1"></i> WhatsApp
+            </a>
+          </li>
+        </ul>
+
+        <!-- Mobile Toggle -->
+        <button id="menuBtn" class="md:hidden p-2 text-stone-400 hover:text-white focus:outline-none" aria-label="Toggle Menu">
+          <svg id="menuIconOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <svg id="menuIconClose" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="hidden md:hidden overflow-hidden transition-all duration-300 ease-in-out border-t border-white/5 py-4 space-y-1">
+        <a href="{% url 'store:home' %}#products" class="mobile-nav-link">Collection</a>
+        <a href="{% url 'store:auction_list' %}" class="mobile-nav-link !text-brand font-semibold">🔴 Live Auctions</a>
+        <a href="{% url 'store:my_bids' %}" class="mobile-nav-link">My Bids</a>
+        <a href="{% url 'store:about' %}" class="mobile-nav-link">About</a>
+        <div class="pt-4 px-4">
+            {% whatsapp_button WHATSAPP_NUMBER "Hello MN Studio!" "WhatsApp Us" %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="pt-16 lg:pt-20 min-h-[80vh]">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ── LUXURY MINIMALIST FOOTER ──────────────────────────────── -->
+  <footer class="bg-background mt-40 pb-20">
+    <div class="max-w-7xl mx-auto px-6">
+    
+      <!-- Top Divider: Thinner and more subtle -->
+      <div class="w-full h-px bg-white/[0.03] mb-24"></div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-16 items-start">
+      
+        <!-- Column 1: Brand Ethos -->
+        <div class="space-y-8">
+          <a href="{% url 'store:home' %}" class="block">
+            <span class="font-serif text-3xl tracking-tight text-white italic">MN <span class="text-brand">Studio</span></span>
+            <span class="block text-[10px] uppercase tracking-[0.5em] text-stone-600 mt-2">Nairobi &bull; Kiambu</span>
+          </a>
+          <p class="text-stone-500 text-sm leading-relaxed font-light tracking-wide max-w-xs">
+            An artisanal collective dedicated to the preservation of timber craft. We create bespoke, sculptural furniture[cite: 1].
+          </p>
+        </div>
+
+        <!-- Column 2: Minimalist Social Icons (Center) -->
+        <div class="flex flex-col md:items-center space-y-6">
+          <h4 class="text-[10px] uppercase tracking-[0.4em] text-stone-700 font-bold">Follow the Craft</h4>
+          <div class="flex gap-8 items-center">
+              <a href="https://www.youtube.com/@n_mbachia" class="text-stone-500 hover:text-brand transition-all duration-500 text-lg" aria-label="YouTube">
+                  <i class="fab fa-youtube"></i>
+              </a>
+              <a href="#" class="text-stone-500 hover:text-brand transition-all duration-500 text-lg" aria-label="Instagram">
+                  <i class="fab fa-instagram"></i>
+              </a>
+              <a href="https://wa.me/254715741222" class="text-stone-500 hover:text-brand transition-all duration-500 text-lg" aria-label="WhatsApp">
+                  <i class="fab fa-whatsapp"></i>
+              </a>
+          </div>
+        </div>
+
+        <!-- Column 3: Direct Action -->
+        <div class="flex flex-col md:items-end space-y-8">
+          <div class="space-y-2 md:text-right">
+            <h4 class="text-[10px] uppercase tracking-[0.4em] text-stone-700 font-bold">Inquiries</h4>
+            <a href="mailto:studio@mnventures.co.ke" class="text-xl text-stone-300 font-light hover:text-brand transition-colors">studio@mnventures.co.ke</a>
+          </div>
+        
+          <div class="space-y-2 md:text-right">
+             <h4 class="text-[10px] uppercase tracking-[0.4em] text-stone-700 font-bold">Studio Access</h4>
+             <p class="text-sm text-stone-500 font-light">By Appointment Only &bull; Kiambu</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Bar: Zero distractions -->
+      <div class="mt-32 pt-8 flex flex-col md:flex-row justify-between border-t border-white/[0.02]">
+        <div class="text-stone-700 text-[9px] uppercase tracking-[0.3em]">
+          &copy; {% now "Y" %} MN Ventures &nbsp;&bull;&nbsp; MN Studio[cite: 2]
+        </div>
+        <div class="flex gap-8 text-stone-800 text-[9px] uppercase tracking-[0.3em] mt-4 md:mt-0">
+          <a href="{% url 'store:privacy' %}" class="hover:text-stone-500 transition">Privacy</a>
+          <a href="{% url 'store:terms' %}" class="hover:text-stone-500 transition">Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- =====Java script for the front end ====== -->
+  <!-- GLOBAL JS -->
+  <script>
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const iconOpen = document.getElementById('menuIconOpen');
+    const iconClose = document.getElementById('menuIconClose');
+    
+    function toggleMenu() {
+        mobileMenu.classList.toggle('hidden');
+        iconOpen.classList.toggle('hidden');
+        iconClose.classList.toggle('hidden');
+    }
+
+    if (menuBtn) {
+      menuBtn.addEventListener('click', toggleMenu);
+    }
+
+    // AUTO-COLLAPSE: Close menu when any link inside it is clicked
+    const mobileLinks = mobileMenu.querySelectorAll('a');
+    mobileLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        if (!mobileMenu.classList.contains('hidden')) {
+          toggleMenu();
+        }
+      });
+    });
+
+    // CSRF fetch wrapper
+    const _origFetch = window.fetch;
+    window.fetch = function(url, opts = {}) {
+      if (opts.method?.toUpperCase() === 'POST') {
+        opts.headers = opts.headers || {};
+        const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (csrf) opts.headers['X-CSRFToken'] = csrf;
+      }
+      return _origFetch(url, opts);
+    };
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

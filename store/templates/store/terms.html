@@ -1,0 +1,68 @@
+{% extends 'store/base.html' %}
+{% block title %}Terms & Conditions — {{ business_name }}{% endblock %}
+{% block meta_description %}Review the auction rules, VAT policy, and terms of sale for {{ business_name }}. High-end artisanal furniture in Nairobi.{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-6 py-20 reveal">
+  <div class="text-center mb-16">
+    <span class="section-eyebrow">✦ Legal Framework</span>
+    <h1 class="section-title">Terms & <em>Conditions</em></h1>
+    <p class="text-stone-500 text-xs tracking-widest uppercase mt-4">Last updated: {% now "d F Y" %}</p>
+  </div>
+
+  <div class="space-y-12 text-stone-300 text-sm leading-relaxed">
+    
+    <!-- Section 1: General -->
+    <section class="card rounded-none p-10 border-white/5 space-y-6">
+      <h2 class="font-serif text-2xl text-white">01. General Provisions</h2>
+      <p>These Terms & Conditions govern the relationship between <strong>{{ business_name }}</strong> and our clientele. By engaging in an auction or direct purchase, you acknowledge and agree to these standards of service.</p>
+      <p>{{ business_name }} is a premium furniture entity based in {{ business_location }}. For immediate assistance, contact our studio via <span class="text-brand font-bold">WhatsApp: +254 715 741 222</span>.</p>
+    </section>
+
+    <!-- Section 2: Auction Rules -->
+    <section class="card rounded-none p-10 border-white/5 space-y-6">
+      <div class="flex justify-between items-start">
+        <h2 class="font-serif text-2xl text-white">02. Auction Protocols</h2>
+        <span class="badge badge-live">Live Rules</span>
+      </div>
+      <ul class="space-y-4 text-stone-400">
+        <li class="flex gap-4"><span class="text-brand">✦</span> <span>Bids are <strong class="text-white">legally binding</strong> commitments to purchase. Retractions are not permitted once a bid is recorded.</span></li>
+        <li class="flex gap-4"><span class="text-brand">✦</span> <span><strong>Anti-Sniping:</strong> Any bid placed within the final 120 seconds extends the auction by an additional 120 seconds to ensure fair opportunity.</span></li>
+        <li class="flex gap-4"><span class="text-brand">✦</span> <span><strong>Proxy Bidding:</strong> Our system allows for maximum bid entry, automatically bidding on your behalf up to your specified limit.</span></li>
+        <li class="flex gap-4"><span class="text-brand">✦</span> <span>We reserve the right to void bids originating from accounts suspected of manipulative or fraudulent behavior.</span></li>
+      </ul>
+    </section>
+
+    <!-- Section 3: Financials -->
+    <section class="card rounded-none p-10 border-white/5 space-y-6">
+      <h2 class="font-serif text-2xl text-white">03. Payment & Taxation</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="space-y-3">
+          <p class="text-xs uppercase tracking-widest text-stone-500">Settlement</p>
+          <p>Full payment is required within <strong class="text-white">48 hours</strong> of an auction win. Unpaid wins are voided and offered to the subsequent bidder.</p>
+        </div>
+        <div class="space-y-3">
+          <p class="text-xs uppercase tracking-widest text-stone-500">VAT Compliance</p>
+          <p>All prices are inclusive of <strong class="text-white">16% VAT</strong> per KRA regulations. Formal tax invoices are issued upon successful transaction completion.</p>
+        </div>
+      </div>
+      <div class="pt-4 border-t border-white/5">
+        <p class="text-xs">Official Paybill: <span class="text-white font-bold">247247</span> | Account: <span class="text-white font-bold">741222</span></p>
+      </div>
+    </section>
+
+    <!-- Section 4: Logistics -->
+    <section class="card rounded-none p-10 border-white/5 space-y-6">
+      <h2 class="font-serif text-2xl text-white">04. Delivery & Returns</h2>
+      <p>White-glove delivery is available throughout Nairobi and major metropolitan hubs in Kenya. Logistics fees are calculated based on item volume and destination[cite: 3].</p>
+      <p class="badge badge-limited">Returns Policy</p>
+      <p class="text-stone-400 italic">Given the bespoke and artisanal nature of our furniture, returns are only accepted within 7 days if the item is materially defective or inaccurately described[cite: 3].</p>
+    </section>
+
+  </div>
+
+  <div class="mt-20 text-center">
+    <a href="{% url 'store:home' %}" class="btn-ghost">Return to Gallery</a>
+  </div>
+</div>
+{% endblock %}

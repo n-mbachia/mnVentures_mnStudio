@@ -1,0 +1,50 @@
+/*
+ * custom.css — only contains things Tailwind utilities can't express.
+ * Everything else lives in static/src/main.css and is compiled by Tailwind.
+ *
+ * This file is loaded AFTER tailwind.css in base.html.
+ */
+
+/* Hero background grid — requires CSS background-image shorthand */
+.hero-grid-bg {
+  background-image:
+    linear-gradient(rgba(217, 119, 6, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 119, 6, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Noise overlay via pseudo-element (pointer-events:none can't be in @apply) */
+.noise-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.4;
+  z-index: 0;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #78350f #1c1917;
+}
+
+
+/* Cinematic slow pan (Ken Burns style) */
+.cinematic-pan {
+  animation: cinematicPan 28s ease-in-out infinite alternate;
+  transform: scale(1.1);
+}
+
+@keyframes cinematicPan {
+  0% {
+    transform: scale(1.1) translateX(0%) translateY(0%);
+  }
+  50% {
+    transform: scale(1.15) translateX(-2%) translateY(-1%);
+  }
+  100% {
+    transform: scale(1.1) translateX(2%) translateY(1%);
+  }
+}

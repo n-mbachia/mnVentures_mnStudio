@@ -1,0 +1,132 @@
+{% extends 'store/base.html' %}
+{% load store_tags %}
+{% block title %}My Bids — MN Studio{% endblock %}
+{% block meta_robots %}noindex, nofollow{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-16">
+  <div class="text-center mb-12">
+    <span class="section-eyebrow">✦ Bidder Dashboard</span>
+    <h1 class="section-title">My <em>Bids</em></h1>
+    <p class="text-stone-400 text-sm mt-3">Look up your bid history by entering your phone number.</p>
+  </div>
+
+  <!-- Search form -->
+  <form method="get" class="card p-6 mb-10 flex flex-col sm:flex-row gap-4">
+    <input type="tel" name="phone" value="{{ phone }}"
+           placeholder="+254 7XX XXX XXX"
+           class="field flex-1"
+           required>
+    <button type="submit" class="btn-primary px-8">Look Up My Bids</button>
+  </form>
+
+  {% if phone and not bidder %}
+  <div class="alert-warning text-center py-8">
+    No bidder found for <strong>{{ phone }}</strong>. Make sure you use the same number you bid with.
+  </div>
+  {% endif %}
+
+  {% if bidder %}
+  <!-- Bidder info -->
+  <div class="card p-6 mb-8 flex items-center gap-5">
+    <div class="w-14 h-14 rounded-full bg-brand/20 border border-brand/40 flex items-center justify-center text-2xl font-bold text-brand font-serif">
+      {{ bidder.name|first|upper }}
+    </div>
+    <div>
+      <div class="font-semibold text-lg">{{ bidder.name }}</div>
+      <div class="text-stone-400 text-sm">{{ bidder.phone }}</div>
+      {% if bidder.email %}<div class="text-stone-500 text-xs">{{ bidder.email }}</div>{% endif %}
+    </div>
+    <div class="ml-auto text-right">
+      <div class="text-2xl font-serif font-black text-brand">{{ bids|length }}</div>
+      <div class="text-stone-500 text-xs uppercase tracking-wider">Total Bids</div>
+    </div>
+  </div>
+
+  <!-- Won auctions -->
+  {% if won %}
+  <div class="mb-10">
+    <h2 class="font-serif text-2xl font-bold mb-4">🏆 Auctions Won</h2>
+    <div class="space-y-3">
+      {% for auction in won %}
+      <a href="{% url 'store:auction_detail' auction.slug %}"
+         class="card p-5 flex items-center gap-5 hover:border-brand/40 transition group">
+        <div class="text-3xl">🎉</div>
+        <div class="flex-1 min-w-0">
+          <div class="font-semibold group-hover:text-brand transition truncate">{{ auction.product.name }}</div>
+          <div class="text-stone-500 text-xs mt-0.5">Won {{ auction.end_time|date:"d M Y" }}</div>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <div class="font-serif font-bold text-brand text-xl">{{ auction.winning_bid|kes }}</div>
+          {% if not auction.payments.filter %}
+          <a href="{% url 'store:auction_detail' auction.slug %}"
+             class="btn-whatsapp text-xs mt-2">Pay Now</a>
+          {% else %}
+          <span class="badge badge-new">Paid ✓</span>
+          {% endif %}
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Bid history -->
+  <div>
+    <h2 class="font-serif text-2xl font-bold mb-4">Bid History</h2>
+    {% if bids %}
+    <div class="card overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-surface-2 border-b border-surface-3">
+          <tr>
+            <th class="text-left px-5 py-3 text-2xs uppercase tracking-wider text-stone-400">Item</th>
+            <th class="text-left px-5 py-3 text-2xs uppercase tracking-wider text-stone-400">Bid Amount</th>
+            <th class="text-left px-5 py-3 text-2xs uppercase tracking-wider text-stone-400 hidden sm:table-cell">Date</th>
+            <th class="text-left px-5 py-3 text-2xs uppercase tracking-wider text-stone-400">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-surface-3/50">
+          {% for bid in bids %}
+          <tr class="hover:bg-surface-2/50 transition {% if bid.is_winning %}bg-amber-950/20{% endif %}">
+            <td class="px-5 py-3">
+              <a href="{% url 'store:auction_detail' bid.auction.slug %}" class="hover:text-brand transition font-medium">
+                {{ bid.auction.product.name }}
+              </a>
+              {% if bid.is_proxy %}<span class="badge badge-limited ml-1">auto</span>{% endif %}
+            </td>
+            <td class="px-5 py-3 font-serif font-bold {% if bid.is_winning %}text-brand{% else %}text-stone-300{% endif %}">
+              {{ bid.amount|kes }}
+              {% if bid.is_winning %}<span class="text-xs ml-1">🏆</span>{% endif %}
+            </td>
+            <td class="px-5 py-3 text-stone-500 hidden sm:table-cell">{{ bid.placed_at|date:"d M Y H:i" }}</td>
+            <td class="px-5 py-3">
+              {% if bid.auction.status == 'live' %}
+                {% if bid.auction.bids.first == bid %}
+                  <span class="badge badge-live">Leading</span>
+                {% else %}
+                  <span class="badge badge-upcoming">Active</span>
+                {% endif %}
+              {% elif bid.is_winning %}
+                <span class="badge badge-bestseller">Won</span>
+              {% elif bid.auction.status == 'closed' %}
+                <span class="badge badge-closed">Ended</span>
+              {% else %}
+                <span class="badge badge-limited">{{ bid.auction.get_status_display }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="card p-12 text-center text-stone-500">
+      <div class="text-5xl mb-3">🔍</div>
+      <p>No bids found for this phone number.</p>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
