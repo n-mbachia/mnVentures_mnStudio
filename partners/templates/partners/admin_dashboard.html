@@ -1,0 +1,193 @@
+{% extends "store/base.html" %}
+{% block title %}Partners Dashboard{% endblock %}
+
+{% block extra_head %}
+<style>
+  .stat-card { @apply bg-white rounded-xl border border-stone-100 shadow-sm p-5; }
+  .tbl th { @apply text-xs font-bold uppercase tracking-widest text-stone-500 px-4 py-3 text-left border-b border-stone-100; }
+  .tbl td { @apply px-4 py-3 text-sm text-stone-700 border-b border-stone-50; }
+  .tbl tr:hover td { background:#fffbeb; }
+  .pill { display:inline-block; padding:2px 10px; border-radius:9999px; font-size:11px; font-weight:600; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="max-w-7xl mx-auto px-4 py-8">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="font-display text-3xl font-bold text-wood-800">Partner &amp; Workshop Dashboard</h1>
+      <p class="text-stone-500 text-sm mt-1">Manage partner applications and design submissions</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="{% url 'partners:become_partner' %}" target="_blank"
+         class="text-xs bg-brand-500 hover:bg-brand-600 text-wood-900 font-bold px-4 py-2 rounded-lg transition-colors">
+        View Public Form ↗
+      </a>
+      <a href="/admin/partners/" class="text-xs bg-wood-800 hover:bg-wood-700 text-white font-bold px-4 py-2 rounded-lg transition-colors">
+        Django Admin ↗
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats row -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-xl border border-stone-100 shadow-sm p-5 text-center">
+      <p class="text-3xl font-bold text-amber-600">{{ pending_count }}</p>
+      <p class="text-xs text-stone-500 mt-1 font-medium uppercase tracking-wide">Pending Review</p>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-100 shadow-sm p-5 text-center">
+      <p class="text-3xl font-bold text-green-600">{{ approved_count }}</p>
+      <p class="text-xs text-stone-500 mt-1 font-medium uppercase tracking-wide">Active Partners</p>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-100 shadow-sm p-5 text-center">
+      <p class="text-3xl font-bold text-purple-600">{{ open_jobs }}</p>
+      <p class="text-xs text-stone-500 mt-1 font-medium uppercase tracking-wide">Open Workshop Jobs</p>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-100 shadow-sm p-5 text-center">
+      <p class="text-3xl font-bold text-wood-700">{{ submissions|length }}</p>
+      <p class="text-xs text-stone-500 mt-1 font-medium uppercase tracking-wide">Total Submissions</p>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <form method="get" class="mb-6 flex gap-2">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search by name, business, email, county…"
+      class="partner-input flex-1 max-w-md" />
+    <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-wood-900 font-bold px-5 py-2 rounded-lg transition-colors text-sm">
+      Search
+    </button>
+    {% if q %}<a href="{% url 'partners:admin_dashboard' %}" class="text-sm text-stone-500 self-center hover:text-stone-700">Clear</a>{% endif %}
+  </form>
+
+  <!-- ── Partner Applications table ──────────────────────────────────────── -->
+  <div class="bg-white rounded-2xl shadow border border-stone-100 overflow-hidden mb-10">
+    <div class="px-6 py-4 border-b border-stone-100 flex items-center justify-between">
+      <h2 class="font-display text-lg font-semibold text-wood-800">Partner Applications</h2>
+      <span class="text-xs text-stone-400">{{ applications|length }} result{{ applications|length|pluralize }}</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="tbl w-full">
+        <thead>
+          <tr>
+            <th>Business</th>
+            <th>Contact</th>
+            <th>Location</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Submitted</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app in applications %}
+          <tr>
+            <td>
+              <p class="font-semibold text-wood-800">{{ app.business_name }}</p>
+              <p class="text-stone-400 text-xs">{{ app.full_name }}</p>
+            </td>
+            <td>
+              <p>{{ app.mobile }}</p>
+              <p class="text-stone-400 text-xs">{{ app.email }}</p>
+            </td>
+            <td>{{ app.town }}, {{ app.county }}</td>
+            <td>{{ app.get_business_type_display }}</td>
+            <td>
+              <span class="pill
+                {% if app.status == 'approved' %}badge-approved
+                {% elif app.status == 'rejected' %}badge-rejected
+                {% elif app.status == 'on_hold' %}badge-on_hold
+                {% else %}badge-pending{% endif %}">
+                {{ app.get_status_display }}
+              </span>
+              {% if app.partner_code %}
+                <p class="text-xs text-stone-400 mt-0.5">{{ app.partner_code }}</p>
+              {% endif %}
+            </td>
+            <td class="text-stone-400 text-xs">{{ app.submitted_at|date:"d M Y" }}</td>
+            <td>
+              <a href="{% url 'partners:admin_application_detail' app.pk %}"
+                 class="text-brand-700 font-semibold text-xs hover:underline whitespace-nowrap">
+                View →
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="text-center text-stone-400 py-8">No applications found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Design Submissions table ───────────────────────────────────────── -->
+  <div class="bg-white rounded-2xl shadow border border-stone-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-stone-100 flex items-center justify-between">
+      <h2 class="font-display text-lg font-semibold text-wood-800">Design Submissions / Workshop Jobs</h2>
+      <span class="text-xs text-stone-400">{{ submissions|length }} result{{ submissions|length|pluralize }}</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="tbl w-full">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Project</th>
+            <th>Partner</th>
+            <th>Type</th>
+            <th>Site Location</th>
+            <th>Priority</th>
+            <th>Workshop Status</th>
+            <th>Submitted</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sub in submissions %}
+          <tr>
+            <td class="text-stone-400 font-mono">#{{ sub.pk|stringformat:"05d" }}</td>
+            <td class="font-semibold text-wood-800">{{ sub.project_title }}</td>
+            <td>
+              <p>{{ sub.partner.business_name }}</p>
+              <p class="text-stone-400 text-xs">{{ sub.partner.mobile }}</p>
+            </td>
+            <td>{{ sub.get_project_type_display }}</td>
+            <td>{{ sub.site_location }}</td>
+            <td>
+              <span class="pill
+                {% if sub.priority == 'urgent' %}bg-red-100 text-red-700
+                {% elif sub.priority == 'flexible' %}bg-stone-100 text-stone-600
+                {% else %}bg-brand-100 text-brand-800{% endif %}">
+                {{ sub.get_priority_display }}
+              </span>
+            </td>
+            <td>
+              <span class="pill
+                {% if sub.workshop_status == 'completed' %}badge-approved
+                {% elif sub.workshop_status == 'cancelled' %}badge-rejected
+                {% elif sub.workshop_status == 'in_progress' %}bg-purple-100 text-purple-700
+                {% elif sub.workshop_status == 'quoted' %}bg-amber-100 text-amber-700
+                {% elif sub.workshop_status == 'reviewing' %}bg-blue-100 text-blue-700
+                {% else %}bg-stone-100 text-stone-600{% endif %}">
+                {{ sub.get_workshop_status_display }}
+              </span>
+            </td>
+            <td class="text-stone-400 text-xs">{{ sub.submitted_at|date:"d M Y" }}</td>
+            <td>
+              <a href="{% url 'partners:admin_submission_detail' sub.pk %}"
+                 class="text-brand-700 font-semibold text-xs hover:underline whitespace-nowrap">
+                View →
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="9" class="text-center text-stone-400 py-8">No design submissions yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

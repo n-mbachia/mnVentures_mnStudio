@@ -21,6 +21,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'store',
+    'partners',
+    'compliance',
     'django_celery_beat',
     'django_celery_results',
 ]
@@ -159,8 +161,8 @@ WHATSAPP_NUMBER = config('WHATSAPP_NUMBER', default='')
 BUSINESS_NAME = config('BUSINESS_NAME', default='MN Ventures')
 BUSINESS_LOCATION = config('BUSINESS_LOCATION', default='Kenya')
 CURRENCY_SYMBOL = 'Kes'
-VAT_RATE_DISPLAY = '16%'
-VAT_REGISTRATION = config('VAT_REGISTRATION', default='')
+# VAT_RATE_DISPLAY = '16%'
+# VAT_REGISTRATION = config('VAT_REGISTRATION', default='')
 
 # ── Logging ───────────────────────────────────────────────
 (BASE_DIR / 'logs').mkdir(exist_ok=True)

@@ -1,0 +1,31 @@
+{% extends "store/base.html" %}
+{% block title %}Design Submitted{% endblock %}
+{% block content %}
+<section class="max-w-2xl mx-auto px-4 py-24 text-center">
+  <div class="bg-white rounded-2xl shadow-lg border border-stone-100 p-12">
+    <div class="text-6xl mb-6">📐</div>
+    <h1 class="font-display text-3xl font-bold text-wood-800 mb-3">Brief Received!</h1>
+    <p class="text-stone-500 text-base mb-8">
+      Your design brief has been submitted to the MN Ventures workshop team.<br>
+      We'll review it and get back to you with a quote within <strong class="text-wood-700">3 business days</strong>.
+    </p>
+    <div class="bg-brand-50 border border-brand-200 rounded-xl p-5 text-left text-sm text-stone-600 space-y-2 mb-8">
+      <p><span class="font-semibold text-wood-700">What happens next?</span></p>
+      <p>🔍 Our workshop reviews the design files and project scope</p>
+      <p>💬 We contact you with any clarifying questions</p>
+      <p>💰 A detailed quote is shared with you via WhatsApp or email</p>
+      <p>🔨 Upon approval work is scheduled as a priority order</p>
+    </div>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="{% url 'partners:submit_design' %}" class="bg-brand-500 hover:bg-brand-600 text-wood-900 font-bold px-6 py-2.5 rounded-lg transition-colors">
+        + Submit Another Brief
+      </a>
+      <a href="https://wa.me/254715741222?text=Hello%20MN%20Ventures%2C%20I%20just%20submitted%20a%20design%20brief."
+         target="_blank"
+         class="bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-2.5 rounded-lg transition-colors">
+        📱 Follow up on WhatsApp
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

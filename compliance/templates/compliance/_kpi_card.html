@@ -1,0 +1,24 @@
+<!-- compliance/templates/compliance/_kpi_card.html -->
+
+{% load compliance_extras %}
+{% comment %}
+  KPI card partial — include params:
+    label   : string     — card title
+    value   : Decimal    — the number to display
+    colour  : string     — green | amber | orange | teal | red | indigo
+    icon    : string     — emoji icon
+    sign    : bool       — if True, wraps negative values in parentheses
+{% endcomment %}
+
+{% with bg=colour|default:"indigo" %}
+<div class="bg-{{ bg }}-50 border border-{{ bg }}-200 rounded-2xl p-4 shadow-sm">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="text-lg">{{ icon }}</span>
+    <p class="text-xs font-medium text-stone-500 leading-tight">{{ label }}</p>
+  </div>
+  <p class="text-xl sm:text-2xl font-bold big-num {{ value|neg_class:'' }} text-{{ bg }}-700">
+    {% if sign and value < 0 %}({{ value|abs_value|floatformat:2 }}){% else %}{{ value|floatformat:2 }}{% endif %}
+  </p>
+  <p class="text-xs text-stone-400 mt-0.5">KES</p>
+</div>
+{% endwith %}

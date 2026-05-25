@@ -10,5 +10,7 @@ urlpatterns = [
     path('sitemap.xml', store_views.sitemap,    name='sitemap'),
     path('robots.txt',  store_views.robots_txt, name='robots_txt'),
     path('', include('store.urls')),
+    path('partners/', include('partners.urls')),
+    path('compliance/', include('compliance.urls')),
     path('.well-known/appspecific/com.chrome.devtools.json', lambda r: HttpResponse(status=204)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

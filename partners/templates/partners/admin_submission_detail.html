@@ -1,0 +1,152 @@
+{% extends "store/base.html" %}
+{% block title %}Submission #{{ submission.pk|stringformat:"05d" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+
+  <nav class="text-sm text-stone-400 mb-6">
+    <a href="{% url 'partners:admin_dashboard' %}" class="hover:text-brand-700">← Dashboard</a>
+    <span class="mx-2">/</span>
+    <a href="{% url 'partners:admin_application_detail' submission.partner.pk %}" class="hover:text-brand-700">{{ submission.partner.business_name }}</a>
+    <span class="mx-2">/</span>
+    <span class="text-stone-700">{{ submission.project_title }}</span>
+  </nav>
+
+  <div class="grid sm:grid-cols-3 gap-6">
+
+    <!-- ── Submission details ───────────────────────────────────────────── -->
+    <div class="sm:col-span-2 space-y-5">
+
+      <div class="bg-white rounded-2xl border border-stone-100 shadow overflow-hidden">
+        <div class="bg-wood-800 px-6 py-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-stone-400 text-xs font-mono mb-1">#{{ submission.pk|stringformat:"05d" }}</p>
+              <h1 class="font-display text-white text-xl font-bold">{{ submission.project_title }}</h1>
+              <p class="text-stone-300 text-sm">{{ submission.get_project_type_display }} · {{ submission.site_location }}</p>
+            </div>
+            <span class="pill text-sm
+              {% if submission.workshop_status == 'completed' %}badge-approved
+              {% elif submission.workshop_status == 'cancelled' %}badge-rejected
+              {% elif submission.workshop_status == 'in_progress' %}bg-purple-100 text-purple-700
+              {% elif submission.workshop_status == 'quoted' %}bg-amber-100 text-amber-700
+              {% elif submission.workshop_status == 'reviewing' %}bg-blue-100 text-blue-700
+              {% else %}bg-stone-200 text-stone-600{% endif %}">
+              {{ submission.get_workshop_status_display }}
+            </span>
+          </div>
+        </div>
+
+        <div class="px-6 py-5 grid sm:grid-cols-2 gap-4 text-sm">
+          <div><p class="text-xs text-stone-400 uppercase tracking-wide mb-0.5">Partner</p><p class="font-medium">{{ submission.partner.business_name }}</p><p class="text-stone-400 text-xs">{{ submission.partner.mobile }}</p></div>
+          <div><p class="text-xs text-stone-400 uppercase tracking-wide mb-0.5">Priority</p>
+            <span class="pill
+              {% if submission.priority == 'urgent' %}bg-red-100 text-red-700
+              {% elif submission.priority == 'flexible' %}bg-stone-100 text-stone-600
+              {% else %}bg-brand-100 text-brand-800{% endif %}">
+              {{ submission.get_priority_display }}
+            </span>
+          </div>
+          <div><p class="text-xs text-stone-400 uppercase tracking-wide mb-0.5">Start Date</p><p class="font-medium">{{ submission.expected_start_date|date:"d M Y" }}</p></div>
+          <div><p class="text-xs text-stone-400 uppercase tracking-wide mb-0.5">Completion Date</p><p class="font-medium">{{ submission.expected_completion_date|date:"d M Y" }}</p></div>
+          <div><p class="text-xs text-stone-400 uppercase tracking-wide mb-0.5">Budget Range (KSh)</p><p class="font-medium">{{ submission.budget_range|default:"Not specified" }}</p></div>
+          {% if submission.quoted_amount %}
+          <div><p class="text-xs text-stone-400 uppercase tracking-wide mb-0.5">Quoted Amount (KSh)</p><p class="font-bold text-green-700">{{ submission.quoted_amount|floatformat:0 }}</p></div>
+          {% endif %}
+          {% if submission.assigned_to %}
+          <div><p class="text-xs text-stone-400 uppercase tracking-wide mb-0.5">Assigned To</p><p class="font-medium">{{ submission.assigned_to }}</p></div>
+          {% endif %}
+          <div class="sm:col-span-2"><p class="text-xs text-stone-400 uppercase tracking-wide mb-1">Project Description</p>
+            <p class="text-stone-700 bg-stone-50 rounded-lg p-3 text-sm leading-relaxed">{{ submission.description }}</p>
+          </div>
+          {% if submission.admin_notes %}
+          <div class="sm:col-span-2"><p class="text-xs text-stone-400 uppercase tracking-wide mb-1">Workshop Notes</p>
+            <p class="text-stone-700 bg-amber-50 border border-amber-100 rounded-lg p-3 text-sm leading-relaxed">{{ submission.admin_notes }}</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Design files -->
+        {% if submission.file_list %}
+        <div class="px-6 pb-5">
+          <p class="text-xs text-stone-400 uppercase tracking-wide mb-3">Design Files</p>
+          <div class="space-y-2">
+            {% for label, file in submission.file_list %}
+            <a href="{{ file.url }}" target="_blank"
+               class="flex items-center gap-3 bg-brand-50 hover:bg-brand-100 border border-brand-100 rounded-lg px-4 py-3 transition-colors text-sm group">
+              <span class="text-xl">📎</span>
+              <div class="flex-1 min-w-0">
+                <p class="font-semibold text-wood-700 group-hover:underline truncate">{{ label }}: {{ file.name|truncatechars:50 }}</p>
+              </div>
+              <span class="text-brand-600 text-xs font-bold whitespace-nowrap">Download ↓</span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="px-6 pb-4 text-xs text-stone-400">
+          Submitted: {{ submission.submitted_at|date:"d M Y, H:i" }}
+          · Updated: {{ submission.updated_at|date:"d M Y, H:i" }}
+        </div>
+      </div>
+
+      <!-- WhatsApp partner link -->
+      <a href="https://wa.me/{{ submission.partner.mobile|cut:'+' |cut:' ' }}?text=Hello%20{{ submission.partner.full_name|urlencode }}%2C%20regarding%20your%20project%20{{ submission.project_title|urlencode }}."
+         target="_blank"
+         class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold text-sm px-4 py-2 rounded-lg transition-colors">
+        📱 WhatsApp Partner About This Job
+      </a>
+
+    </div>
+
+    <!-- ── Workshop action panel ────────────────────────────────────────── -->
+    <div>
+      <div class="bg-white rounded-2xl border border-stone-100 shadow p-5">
+        <h2 class="font-display font-semibold text-wood-800 text-lg mb-4">Workshop Actions</h2>
+        <form method="post" class="space-y-4">
+          {% csrf_token %}
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wide text-stone-500 mb-1">Workshop Status</label>
+            <select name="workshop_status" class="partner-input">
+              {% for val, label in submission.WORKSHOP_STATUS_CHOICES %}
+              <option value="{{ val }}" {% if submission.workshop_status == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wide text-stone-500 mb-1">Assign To (Workshop Staff)</label>
+            <input type="text" name="assigned_to" value="{{ submission.assigned_to }}" placeholder="e.g. John Kamau"
+              class="partner-input" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wide text-stone-500 mb-1">Quoted Amount (KSh)</label>
+            <input type="text" name="quoted_amount" value="{{ submission.quoted_amount|default:'' }}" placeholder="e.g. 250000"
+              class="partner-input" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wide text-stone-500 mb-1">Workshop Notes</label>
+            <textarea name="admin_notes" rows="4" class="partner-input" placeholder="Materials, labour notes, timeline comments…">{{ submission.admin_notes }}</textarea>
+          </div>
+
+          <button type="submit"
+            class="w-full bg-brand-500 hover:bg-brand-600 text-wood-900 font-bold py-2.5 rounded-lg transition-colors text-sm">
+            Save Changes
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.pill { display:inline-block; padding:3px 12px; border-radius:9999px; font-size:12px; font-weight:600; }
+.badge-approved { background:#d1fae5; color:#065f46; }
+.badge-rejected { background:#fee2e2; color:#991b1b; }
+</style>
+{% endblock %}

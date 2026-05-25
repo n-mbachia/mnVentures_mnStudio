@@ -1,0 +1,31 @@
+{% extends "store/base.html" %}
+{% block title %}Application Received{% endblock %}
+{% block content %}
+<section class="max-w-2xl mx-auto px-4 py-24 text-center">
+  <div class="bg-white rounded-2xl shadow-lg border border-stone-100 p-12">
+    <div class="text-6xl mb-6">🎉</div>
+    <h1 class="font-display text-3xl font-bold text-wood-800 mb-3">Application Received!</h1>
+    <p class="text-stone-500 text-base mb-8">
+      Thank you for applying to the MN Ventures Partner Programme.<br>
+      Our team will review your details and reach out within <strong class="text-wood-700">2 business days</strong>.
+    </p>
+    <div class="bg-brand-50 border border-brand-200 rounded-xl p-5 text-left text-sm text-stone-600 space-y-2 mb-8">
+      <p><span class="font-semibold text-wood-700">What happens next?</span></p>
+      <p>✅ We review your application details</p>
+      <p>📞 Our team calls or WhatsApps you to verify and discuss</p>
+      <p>🎟️ Upon approval you receive a Partner Code and your special pricing</p>
+      <p>📐 You can then submit project designs directly through our portal</p>
+    </div>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="/" class="bg-brand-500 hover:bg-brand-600 text-wood-900 font-bold px-6 py-2.5 rounded-lg transition-colors">
+        ← Back to Store
+      </a>
+      <a href="https://wa.me/254715741222?text=Hello%20MN%20Ventures%2C%20I%20just%20submitted%20a%20partner%20application."
+         target="_blank"
+         class="bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-2.5 rounded-lg transition-colors">
+        📱 Contact Us on WhatsApp
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% load compliance_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit {{ invoice.invoice_number }} — MN Ventures</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config={theme:{extend:{colors:{brand:{500:"#f59e0b",600:"#d97706",700:"#b45309"},wood:{800:"#4a2518",900:"#2d1509"}},fontFamily:{display:['"Playfair Display"','serif']}}}}
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    body{font-family:'DM Sans',sans-serif;}
+    h1,h2{font-family:'Playfair Display',serif;}
+    .inp{display:block;width:100%;border:1.5px solid #d97706;border-radius:.375rem;background:#fffbeb;padding:.5rem .75rem;font-size:.875rem;}
+    .inp:focus{outline:none;border-color:#b45309;box-shadow:0 0 0 3px rgba(180,83,9,.12);}
+  </style>
+</head>
+<body class="bg-stone-100 min-h-screen">
+
+<nav class="bg-wood-900 border-b-4 border-brand-500">
+  <div class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="font-display text-brand-500 text-xl font-bold">MN</span>
+      <span class="text-stone-500 text-xs">/</span>
+      <a href="{% url 'compliance:sales_portal' %}" class="text-stone-300 text-sm hover:text-brand-400">Sales</a>
+      <span class="text-stone-500 text-xs">/</span>
+      <span class="text-white text-sm">Edit</span>
+    </div>
+    <a href="{% url 'compliance:sales_portal' %}" class="text-xs text-stone-400 hover:text-brand-400">← Back to Sales</a>
+  </div>
+</nav>
+
+<div class="max-w-3xl mx-auto px-4 py-8">
+  <div class="bg-white rounded-2xl border border-stone-200 shadow overflow-hidden">
+    <div class="bg-wood-800 px-6 py-5">
+      <h1 class="font-display text-white text-xl font-semibold">Edit Invoice</h1>
+      <p class="text-stone-300 text-sm mt-0.5">{{ invoice.invoice_number }} · {{ invoice.client_name }} · {{ invoice.date }}</p>
+    </div>
+
+    <form method="post" class="px-6 py-6 space-y-5">
+      {% csrf_token %}
+
+      <div class="grid sm:grid-cols-2 gap-5">
+        {% for field in form %}
+        <div class="{% if field.name == 'description' or field.name == 'notes' or field.name == 'etims_cu_invoice_no' %}sm:col-span-2{% endif %}">
+          <label class="block text-xs font-bold uppercase tracking-widest text-stone-500 mb-1">
+            {{ field.label }}{% if field.field.required %} <span class="text-brand-600">*</span>{% endif %}
+          </label>
+          {{ field }}
+          {% if field.errors %}<p class="text-red-500 text-xs mt-0.5">{{ field.errors.0 }}</p>{% endif %}
+          {% if field.help_text %}<p class="text-stone-400 text-xs mt-0.5">{{ field.help_text }}</p>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      {% if form.non_field_errors %}
+      <div class="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="flex-1 bg-brand-500 hover:bg-brand-600 text-wood-900 font-bold py-3 rounded-xl transition-colors">
+          Save Changes →
+        </button>
+        <a href="{% url 'compliance:sales_portal' %}"
+          class="px-6 flex items-center bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold rounded-xl transition-colors">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Partner Programme{% endblock %} — MN Ventures</title>
+
+  <!-- Tailwind (same CDN as main site) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50:  "#fffbeb", 100: "#fef3c7", 200: "#fde68a",
+              300: "#fcd34d", 400: "#fbbf24", 500: "#f59e0b",
+              600: "#d97706", 700: "#b45309", 800: "#92400e", 900: "#78350f",
+            },
+            wood: { 700: "#6b3a2a", 800: "#4a2518", 900: "#2d1509" },
+          },
+          fontFamily: {
+            display: ['"Playfair Display"', 'serif'],
+            body:    ['"DM Sans"', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    h1,h2,h3 { font-family: 'Playfair Display', serif; }
+
+    .partner-input {
+      width: 100%;
+      padding: .55rem .85rem;
+      border: 1.5px solid #d97706;
+      border-radius: .375rem;
+      background: #fffbeb;
+      color: #1a1a1a;
+      transition: border-color .2s, box-shadow .2s;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .95rem;
+    }
+    .partner-input:focus {
+      outline: none;
+      border-color: #b45309;
+      box-shadow: 0 0 0 3px rgba(180,83,9,.15);
+    }
+    select.partner-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23b45309'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .7rem center; background-size: 1.1rem; padding-right: 2.5rem; }
+
+    .step-dot { width:2rem; height:2rem; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:.85rem; }
+    .file-drop { border: 2px dashed #fcd34d; border-radius:.5rem; background:#fffbeb; transition: background .2s; }
+    .file-drop:hover { background:#fef3c7; }
+
+    .badge-pending    { background:#fef3c7; color:#b45309; }
+    .badge-approved   { background:#d1fae5; color:#065f46; }
+    .badge-rejected   { background:#fee2e2; color:#991b1b; }
+    .badge-on_hold    { background:#f3f4f6; color:#374151; }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-stone-50 text-stone-800 min-h-screen flex flex-col">
+
+  <!-- ── Navbar (mirrors main site) ─────────────────────────────────────── -->
+  <nav class="bg-wood-900 border-b-4 border-brand-500 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2">
+        <span class="font-display text-brand-400 text-2xl font-bold tracking-tight">MN</span>
+        <span class="text-white font-semibold text-sm leading-tight hidden sm:block">Ventures<br><span class="text-brand-300 text-xs font-light">Premium Furniture · Nairobi</span></span>
+      </a>
+      <div class="flex items-center gap-4 text-sm">
+        <a href="/" class="text-stone-300 hover:text-brand-400 transition-colors">← Back to Store</a>
+        <a href="{% url 'partners:become_partner' %}" class="bg-brand-500 hover:bg-brand-600 text-wood-900 font-semibold px-4 py-1.5 rounded transition-colors">Become a Partner</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Main content ────────────────────────────────────────────────────── -->
+  <main class="flex-1">
+    {% if messages %}
+      <div class="max-w-3xl mx-auto px-4 pt-4 space-y-2">
+        {% for msg in messages %}
+          <div class="rounded-lg px-4 py-3 text-sm font-medium
+            {% if msg.tags == 'success' %}bg-green-50 border border-green-200 text-green-800
+            {% elif msg.tags == 'error'   %}bg-red-50   border border-red-200   text-red-800
+            {% else                       %}bg-amber-50 border border-amber-200 text-amber-800{% endif %}">
+            {{ msg }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ── Footer ──────────────────────────────────────────────────────────── -->
+  <footer class="bg-wood-900 text-stone-400 text-sm py-6 mt-16">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-2">
+      <span>© {% now "Y" %} MN Ventures · Nairobi, Kenya</span>
+      <a href="https://wa.me/254715741222" class="text-brand-400 hover:text-brand-300 transition-colors">
+        📱 +254 715 741 222
+      </a>
+    </div>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

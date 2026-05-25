@@ -1,0 +1,103 @@
+{% load compliance_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}{{ period_label }} — Business Compliance Dashboard · MN Ventures{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:"#fffbeb",100:"#fef3c7",200:"#fde68a",300:"#fcd34d",400:"#fbbf24",500:"#f59e0b",600:"#d97706",700:"#b45309",800:"#92400e",900:"#78350f" },
+            wood:  { 700:"#6b3a2a",800:"#4a2518",900:"#2d1509" },
+          },
+          fontFamily: {
+            display: ['"Playfair Display"','serif'],
+            body:    ['"DM Sans"','sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family:'DM Sans',sans-serif; }
+    h1,h2,h3 { font-family:'Playfair Display',serif; }
+    .big-num { font-variant-numeric: tabular-nums; }
+    .compliance-card { position:relative; overflow:hidden; }
+    .compliance-card::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:4px 0 0 4px; }
+    .compliance-card.tot::before  { background:#f59e0b; }
+    .compliance-card.ahl::before  { background:#6366f1; }
+    .compliance-card.sha::before  { background:#10b981; }
+    .compliance-card.nssf::before { background:#94a3b8; }
+    details > summary { cursor:pointer; user-select:none; }
+    details[open] summary .chevron { transform:rotate(180deg); }
+    .chevron { transition:transform .2s; display:inline-block; }
+    .thin-scroll::-webkit-scrollbar { width:4px; }
+    .thin-scroll::-webkit-scrollbar-thumb { background:#fcd34d; border-radius:4px; }
+    @media print {
+      .no-print { display:none !important; }
+      body { background:white; }
+    }
+  {% block extra_styles %}{% endblock %}
+  </style>
+</head>
+<body class="bg-stone-100 min-h-screen">
+
+{% if messages %}
+<div class="fixed top-4 right-4 z-50 space-y-2 max-w-sm no-print">
+  {% for msg in messages %}
+  <div class="message-toast rounded-xl px-4 py-3 text-sm font-medium shadow-lg
+    {% if msg.tags == 'success' %}bg-green-600 text-white
+    {% elif msg.tags == 'error' %}bg-red-600 text-white
+    {% else %}bg-amber-500 text-white{% endif %}">
+    {{ msg }}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<nav class="bg-wood-900 border-b-4 border-brand-500 sticky top-0 z-40 no-print">
+  <div class="max-w-screen-2xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <span class="font-display text-brand-400 text-xl font-bold">MN</span>
+      <span class="text-white font-semibold text-sm hidden sm:block">Ventures</span>
+      <span class="text-stone-500 text-xs hidden sm:block">/</span>
+      <span class="text-stone-300 text-sm">Compliance &amp; Analytics</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="{% url 'compliance:sales_portal' %}" class="text-xs bg-green-600 hover:bg-green-700 text-white font-semibold px-3 py-1.5 rounded-lg transition-colors">
+        💰 Sales Portal
+      </a>
+      <a href="/admin/" class="text-xs text-stone-400 hover:text-brand-400 transition-colors">Admin ↗</a>
+      <a href="/" class="text-xs bg-brand-600 hover:bg-brand-500 text-wood-900 font-semibold px-3 py-1.5 rounded-lg transition-colors">← Store</a>
+    </div>
+  </div>
+</nav>
+
+<div class="max-w-screen-2xl mx-auto px-4 py-6 space-y-6">
+  {% block content %}
+  {% endblock %}
+
+  <footer class="text-center text-xs text-stone-400 py-4">
+    MN Ventures Compliance Dashboard · All statutory rates current as of Kenya Finance Act 2024 ·
+    Always verify with a registered tax agent before remitting.
+  </footer>
+</div>
+
+<script>
+document.querySelectorAll('.message-toast')?.forEach(el => {
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 0.5s ease';
+    setTimeout(() => el.remove(), 500);
+  }, 4000);
+});
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

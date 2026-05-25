@@ -1,0 +1,407 @@
+{% extends "compliance/base.html" %}
+{% load compliance_extras %}
+
+{% block content %}
+  <div class="bg-white rounded-2xl border border-stone-200 shadow-sm px-6 py-4 no-print">
+    <form method="get" class="flex flex-wrap items-end gap-4">
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-widest text-stone-500 mb-1">Month</label>
+        {{ period_form.month }}
+      </div>
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-widest text-stone-500 mb-1">Year</label>
+        {{ period_form.year }}
+      </div>
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-widest text-stone-500 mb-1">NSSF Contribution (KES)</label>
+        {{ period_form.nssf }}
+      </div>
+      <div class="flex items-center gap-2 pb-1">
+        {{ period_form.use_drawings }}
+        <label class="text-sm text-stone-600">{{ period_form.use_drawings.label }}</label>
+      </div>
+      <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-wood-900 font-bold text-sm px-5 py-2 rounded-lg transition-colors">
+        Run Report →
+      </button>
+    </form>
+  </div>
+
+  {% if warnings %}
+  <div class="space-y-2 no-print">
+    {% for w in warnings %}
+    <div class="bg-amber-50 border border-amber-300 rounded-xl px-4 py-3 text-sm text-amber-900 flex gap-2">
+      <span class="shrink-0 mt-0.5">⚠</span><span>{{ w }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl sm:text-3xl font-display font-bold text-wood-900">
+      {{ period_label }}
+      <span class="text-stone-400 font-normal text-lg ml-2">/ Business Report</span>
+    </h1>
+    <button onclick="window.print()" class="no-print text-xs bg-stone-200 hover:bg-stone-300 text-stone-700 font-semibold px-4 py-2 rounded-lg transition-colors">
+      🖨 Print
+    </button>
+  </div>
+
+  <section>
+    <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">① Operational Analytics</h2>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+      {% include "compliance/_kpi_card.html" with label="Gross Sales" value=gross_sales colour="green" icon="💰" %}
+      {% include "compliance/_kpi_card.html" with label="Total Purchases" value=total_purchases colour="amber" icon="🛒" %}
+      {% include "compliance/_kpi_card.html" with label="COGS (Materials)" value=cogs colour="orange" icon="🪵" %}
+      {% include "compliance/_kpi_card.html" with label="Gross Profit" value=gross_profit colour="teal" icon="📈" sign=True %}
+      {% include "compliance/_kpi_card.html" with label="Total OpEx" value=total_opex colour="red" icon="📋" %}
+      {% include "compliance/_kpi_card.html" with label="Net Profit" value=net_profit colour="indigo" icon="🏦" sign=True %}
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-4">
+
+      <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+        <div class="bg-amber-50 border-b border-amber-100 px-5 py-3 flex items-center justify-between">
+          <h3 class="font-display font-semibold text-wood-800">Purchases by Category</h3>
+          <span class="text-xs font-bold text-amber-700 big-num">KES {{ total_purchases|floatformat:2 }}</span>
+        </div>
+        <div class="px-5 py-3 divide-y divide-stone-50 thin-scroll max-h-56 overflow-y-auto">
+          {% if op.purchase_breakdown %}
+            {% for label, amt in op.purchase_breakdown.items %}
+            <div class="flex justify-between py-1.5 text-sm">
+              <span class="text-stone-600">{{ label }}</span>
+              <span class="font-semibold big-num">{{ amt|floatformat:2 }}</span>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p class="text-stone-400 text-sm py-4 text-center">No purchases this period</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+        <div class="bg-red-50 border-b border-red-100 px-5 py-3 flex items-center justify-between">
+          <h3 class="font-display font-semibold text-wood-800">Expenses by Category</h3>
+          <span class="text-xs font-bold text-red-700 big-num">KES {{ total_opex|floatformat:2 }}</span>
+        </div>
+        <div class="px-5 py-3 divide-y divide-stone-50 thin-scroll max-h-56 overflow-y-auto">
+          {% if op.expense_breakdown %}
+            {% for label, amt in op.expense_breakdown.items %}
+            <div class="flex justify-between py-1.5 text-sm">
+              <span class="text-stone-600">{{ label }}</span>
+              <span class="font-semibold big-num">{{ amt|floatformat:2 }}</span>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p class="text-stone-400 text-sm py-4 text-center">No expenses this period</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+        <div class="bg-green-50 border-b border-green-100 px-5 py-3 flex items-center justify-between">
+          <h3 class="font-display font-semibold text-wood-800">Sales &amp; eTIMS Status</h3>
+          <span class="text-xs font-bold text-green-700 big-num">KES {{ gross_sales|floatformat:2 }}</span>
+        </div>
+        <div class="px-5 py-5 space-y-3">
+          <div class="flex justify-between text-sm">
+            <span class="text-stone-500">Total invoices</span>
+            <span class="font-semibold">{{ invoice_count }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-green-600 font-medium">✓ eTIMS raised</span>
+            <span class="font-semibold text-green-700">{{ etims_ok }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-red-500 font-medium">✗ eTIMS pending</span>
+            <span class="font-semibold text-red-600">{{ etims_bad }}</span>
+          </div>
+          {% if etims_bad > 0 %}
+          <p class="text-xs text-red-500 bg-red-50 rounded-lg px-3 py-2">
+            {{ etims_bad }} invoice(s) must be registered on the KRA eTIMS portal.
+          </p>
+          {% endif %}
+          
+          <div class="border-t border-stone-100 pt-3 space-y-1.5 text-sm">
+            <div class="flex justify-between">
+              <span class="text-stone-500">Gross Sales</span>
+              <span class="big-num font-semibold">{{ gross_sales|floatformat:2 }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-stone-500">— COGS</span>
+              <span class="big-num text-orange-600">({{ cogs|floatformat:2 }})</span>
+            </div>
+            <div class="flex justify-between font-semibold border-t border-stone-100 pt-1.5">
+              <span>Gross Profit</span>
+              <span class="big-num {% if gross_profit >= 0 %}text-teal-600{% else %}text-red-600{% endif %}">
+                {{ gross_profit|floatformat:2 }}
+              </span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-stone-500">— OpEx</span>
+              <span class="big-num text-red-500">({{ total_opex|floatformat:2 }})</span>
+            </div>
+            <div class="flex justify-between font-bold border-t-2 border-stone-200 pt-1.5">
+              <span>Net Profit</span>
+              <span class="big-num {% if net_profit >= 0 %}text-indigo-600{% else %}text-red-600{% endif %}">
+                {{ net_profit|floatformat:2 }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400">② Statutory Compliance Obligations — {{ period_label }}</h2>
+      <div class="text-right">
+        <p class="text-xs text-stone-400">Total mandatory obligations</p>
+        <p class="font-display font-bold text-xl text-red-700 big-num">KES {{ total_statutory|floatformat:2 }}</p>
+      </div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      {% for card in statutory_cards %}
+      <div class="compliance-card {{ card.short_name|lower }} bg-white rounded-2xl border border-stone-200 shadow-sm pl-5 pr-5 py-5 flex flex-col gap-3">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <h3 class="font-display font-semibold text-wood-900 text-base leading-snug">{{ card.name }}</h3>
+            {% if card.is_voluntary %}
+            <span class="inline-block text-xs bg-stone-100 text-stone-500 px-2 py-0.5 rounded-full mt-1">Voluntary</span>
+            {% endif %}
+          </div>
+          <div class="text-right shrink-0">
+            <p class="text-xs text-stone-400 mb-0.5">Amount Due</p>
+            <p class="font-bold text-xl big-num
+              {% if card.amount_due == 0 %}text-stone-400
+              {% elif card.is_voluntary %}text-stone-500
+              {% else %}text-red-700{% endif %}">
+              KES {{ card.amount_due|floatformat:2 }}
+            </p>
+          </div>
+        </div>
+
+        <div class="bg-stone-50 rounded-xl px-3 py-2.5 text-xs text-stone-600 space-y-1">
+          <p class="font-semibold text-stone-700">How computed:</p>
+          <p class="font-mono bg-white border border-stone-200 rounded px-2 py-1 text-stone-800">{{ card.calculation_detail }}</p>
+          <p class="text-stone-500 leading-relaxed">{{ card.basis }}</p>
+        </div>
+
+        <div class="text-xs space-y-1.5 border-t border-stone-100 pt-3">
+          <div class="flex items-center gap-1.5">
+            <span class="text-stone-400">📅</span>
+            <span><span class="font-semibold text-stone-700">Due:</span> {{ card.due_date }}</span>
+          </div>
+          <div class="flex items-start gap-1.5">
+            <span class="text-stone-400 mt-0.5">🏦</span>
+            <div>
+              <p class="font-semibold text-stone-700">iTax Payment Path:</p>
+              <p class="text-stone-500">Tax Head: <span class="font-medium text-stone-700">{{ card.itax_head }}</span></p>
+              <p class="text-stone-500">Sub-Head: <span class="font-medium text-stone-700">{{ card.itax_sub_head }}</span></p>
+            </div>
+          </div>
+          <div class="flex items-start gap-1.5">
+            <span class="text-stone-400 mt-0.5">🔑</span>
+            <p class="text-stone-500">{{ card.payment_code }}</p>
+          </div>
+        </div>
+
+        {% if card.alert %}
+        <div class="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800">
+          {{ card.alert }}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <p class="text-xs text-stone-400 mt-3">
+      AHL base used: <strong class="text-stone-600">KES {{ result.drawings_used|floatformat:2 }}</strong>
+      (source: <em>{{ result.drawings_source|friendly_source }}</em>).
+      To use actual drawings, record them in the Drawings Log and enable the toggle above.
+    </p>
+  </section>
+
+  <section class="no-print">
+    <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">③ Quick Data Entry</h2>
+
+    <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <details class="bg-white rounded-2xl border border-stone-200 shadow-sm">
+        <summary class="px-5 py-4 flex items-center justify-between font-semibold text-wood-800 text-sm">
+          🛒 Record Purchase
+          <span class="chevron text-stone-400 text-xs">▼</span>
+        </summary>
+        <div class="px-5 pb-5 border-t border-stone-100 pt-4">
+          <form method="post" action="{% url 'compliance:add_purchase' %}" class="space-y-3">
+            {% csrf_token %}
+            <input type="hidden" name="_month" value="{{ month }}"/>
+            <input type="hidden" name="_year"  value="{{ year }}"/>
+            {% for field in purchase_form %}
+            <div>
+              <label class="block text-xs font-medium text-stone-600 mb-1">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}<p class="text-red-500 text-xs mt-0.5">{{ field.errors.0 }}</p>{% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg text-sm transition-colors">Save Purchase</button>
+          </form>
+        </div>
+      </details>
+
+      <details class="bg-white rounded-2xl border border-stone-200 shadow-sm">
+        <summary class="px-5 py-4 flex items-center justify-between font-semibold text-wood-800 text-sm">
+          📋 Record Expense
+          <span class="chevron text-stone-400 text-xs">▼</span>
+        </summary>
+        <div class="px-5 pb-5 border-t border-stone-100 pt-4">
+          <form method="post" action="{% url 'compliance:add_expense' %}" class="space-y-3">
+            {% csrf_token %}
+            <input type="hidden" name="_month" value="{{ month }}"/>
+            <input type="hidden" name="_year"  value="{{ year }}"/>
+            {% for field in expense_form %}
+            <div>
+              <label class="block text-xs font-medium text-stone-600 mb-1">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}<p class="text-red-500 text-xs mt-0.5">{{ field.errors.0 }}</p>{% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded-lg text-sm transition-colors">Save Expense</button>
+          </form>
+        </div>
+      </details>
+
+      <details class="bg-white rounded-2xl border border-stone-200 shadow-sm">
+        <summary class="px-5 py-4 flex items-center justify-between font-semibold text-wood-800 text-sm">
+          🪵 Material Use
+          <span class="chevron text-stone-400 text-xs">▼</span>
+        </summary>
+        <div class="px-5 pb-5 border-t border-stone-100 pt-4">
+          <form method="post" action="{% url 'compliance:add_material_use' %}" class="space-y-3">
+            {% csrf_token %}
+            <input type="hidden" name="_month" value="{{ month }}"/>
+            <input type="hidden" name="_year"  value="{{ year }}"/>
+            {% for field in material_form %}
+            <div>
+              <label class="block text-xs font-medium text-stone-600 mb-1">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}<p class="text-red-500 text-xs mt-0.5">{{ field.errors.0 }}</p>{% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-lg text-sm transition-colors">Save Usage</button>
+          </form>
+        </div>
+      </details>
+
+      <div class="bg-white rounded-2xl border border-green-200 shadow-sm flex flex-col items-center justify-center p-8 text-center gap-3">
+        <span class="text-4xl">💰</span>
+        <h3 class="font-display font-semibold text-wood-800">Sales Invoices</h3>
+        <p class="text-stone-500 text-sm">Record, edit, and manage all sales invoices in the dedicated portal.</p>
+        <a href="{% url 'compliance:sales_portal' %}"
+          class="mt-1 inline-block bg-green-600 hover:bg-green-700 text-white font-bold text-sm px-6 py-2.5 rounded-xl transition-colors">
+          Open Sales Portal →
+        </a>
+        {% if recent_invoices %}
+        <p class="text-xs text-stone-400">
+          {{ recent_invoices|length }} invoice(s) this period ·
+          <span class="{% if etims_bad > 0 %}text-red-500{% else %}text-green-600{% endif %}">
+            {{ etims_bad }} eTIMS pending
+          </span>
+        </p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="no-print">
+    <h2 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3">④ Recent Entries</h2>
+    <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+
+      <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+        <div class="bg-amber-50 border-b border-amber-100 px-4 py-3">
+          <h3 class="text-sm font-semibold text-wood-800">Recent Purchases</h3>
+        </div>
+        <ul class="divide-y divide-stone-50 thin-scroll max-h-64 overflow-y-auto">
+          {% for p in recent_purchases %}
+          <li class="px-4 py-2.5 text-xs">
+            <div class="flex justify-between">
+              <span class="font-medium text-stone-700 truncate max-w-[140px]">{{ p.item_name }}</span>
+              <span class="font-semibold text-amber-700 big-num shrink-0">{{ p.total_cost|floatformat:2 }}</span>
+            </div>
+            <p class="text-stone-400">{{ p.date }} · {{ p.get_category_display }}</p>
+          </li>
+          {% empty %}
+          <li class="px-4 py-6 text-center text-stone-400 text-xs">No purchases yet</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+        <div class="bg-red-50 border-b border-red-100 px-4 py-3">
+          <h3 class="text-sm font-semibold text-wood-800">Recent Expenses</h3>
+        </div>
+        <ul class="divide-y divide-stone-50 thin-scroll max-h-64 overflow-y-auto">
+          {% for e in recent_expenses %}
+          <li class="px-4 py-2.5 text-xs">
+            <div class="flex justify-between">
+              <span class="font-medium text-stone-700 truncate max-w-[140px]">{{ e.description }}</span>
+              <span class="font-semibold text-red-600 big-num shrink-0">{{ e.amount|floatformat:2 }}</span>
+            </div>
+            <p class="text-stone-400">{{ e.date }} · {{ e.get_category_display }}</p>
+          </li>
+          {% empty %}
+          <li class="px-4 py-6 text-center text-stone-400 text-xs">No expenses yet</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+        <div class="bg-orange-50 border-b border-orange-100 px-4 py-3">
+          <h3 class="text-sm font-semibold text-wood-800">Recent Material Use</h3>
+        </div>
+        <ul class="divide-y divide-stone-50 thin-scroll max-h-64 overflow-y-auto">
+          {% for m in recent_materials %}
+          <li class="px-4 py-2.5 text-xs">
+            <div class="flex justify-between">
+              <span class="font-medium text-stone-700 truncate max-w-[120px]">{{ m.material_name }}</span>
+              <span class="font-semibold text-orange-700 big-num shrink-0">{{ m.line_cost|floatformat:2 }}</span>
+            </div>
+            <p class="text-stone-400">{{ m.date }} · {{ m.quantity_used }} {{ m.unit }}{% if m.job_reference %} · {{ m.job_reference }}{% endif %}</p>
+          </li>
+          {% empty %}
+          <li class="px-4 py-6 text-center text-stone-400 text-xs">No material usage yet</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+        <div class="bg-green-50 border-b border-green-100 px-4 py-3">
+          <h3 class="text-sm font-semibold text-wood-800">Recent Invoices</h3>
+        </div>
+        <ul class="divide-y divide-stone-50 thin-scroll max-h-64 overflow-y-auto">
+          {% for inv in recent_invoices %}
+          <li class="px-4 py-2.5 text-xs">
+            <div class="flex justify-between">
+              <span class="font-medium text-stone-700 truncate max-w-[110px]">{{ inv.client_name }}</span>
+              <span class="font-semibold text-green-700 big-num shrink-0">{{ inv.gross_amount|floatformat:2 }}</span>
+            </div>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span class="text-stone-400">{{ inv.date }} · {{ inv.invoice_number }}</span>
+              {% if inv.etims_registered %}
+                <span class="text-green-500 font-bold">✓</span>
+              {% else %}
+                <span class="text-red-500 font-bold">✗ eTIMS</span>
+              {% endif %}
+            </div>
+          </li>
+          {% empty %}
+          <li class="px-4 py-6 text-center text-stone-400 text-xs">No invoices yet</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+    </div>
+  </section>
+{% endblock %}
